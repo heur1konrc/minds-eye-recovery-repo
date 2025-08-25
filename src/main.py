@@ -166,45 +166,6 @@ def serve_photography_assets(filename):
             return send_from_directory(old_assets_dir, filename)
         return f"Image not found. Checked: {PHOTOGRAPHY_ASSETS_DIR}/{filename} and {old_assets_dir}/{filename}", 404
 
-@app.route('/api/portfolio')
-def get_portfolio():
-    """API endpoint to get portfolio data from SQL database"""
-    try:
-        # Import models properly - same as admin
-        from src.models import Image, Category, ImageCategory, db
-        
-        # Use same query method as admin - Image.query.all()
-        images = Image.query.all()
-        portfolio_data = []
-        
-        print(f"Found {len(images)} images in database")  # Debug log
-        
-        for image in images:
-            # Get categories for this image - same as admin
-            image_categories = [cat.category.name for cat in image.categories]
-            
-            portfolio_item = {
-                'id': str(image.id),  # Convert UUID to string
-                'title': image.title or f"Image {image.id}",
-                'description': image.description or "",
-                'image': image.filename,  # Frontend expects 'image' field
-                'categories': image_categories,
-                'metadata': {
-                    'created_at': image.created_at.isoformat() if image.created_at else None,
-                    'updated_at': image.updated_at.isoformat() if image.updated_at else None
-                }
-            }
-            portfolio_data.append(portfolio_item)
-        
-        print(f"Returning {len(portfolio_data)} portfolio items")  # Debug log
-        return jsonify(portfolio_data)
-        
-    except Exception as e:
-        print(f"Error loading portfolio from database: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify([]), 500
-
 @app.route('/api/categories')
 def get_categories():
     """API endpoint to get all categories"""
