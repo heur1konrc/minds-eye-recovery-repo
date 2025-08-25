@@ -144,7 +144,8 @@ def serve_about_image(filename):
 @app.route('/data/<filename>')
 def serve_data_image(filename):
     """Serve images from the data directory (portfolio and about images)"""
-    data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+    # Use Railway volume mount path
+    data_dir = '/data'
     return send_from_directory(data_dir, filename)
 
 @app.route('/debug/database-info')
