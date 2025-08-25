@@ -859,7 +859,7 @@ def about_page():
         # Generate the image HTML based on whether an image exists
         if first_about_image:
             image_html = f'''
-                            <img src="/data/{first_about_image.filename}" 
+                            <img src="/static/assets/{first_about_image.filename}" 
                                  alt="{first_about_image.title}"
                                  class="w-full h-full object-cover">
             '''
@@ -889,7 +889,7 @@ def about_page():
             for img in additional_images:
                 additional_images_html += f'''
                     <div class="about-gallery-item">
-                        <img src="/data/{img.filename}" alt="{img.title}">
+                        <img src="/static/assets/{img.filename}" alt="{img.title}">
                         <p>{img.title}</p>
                     </div>
                 '''
