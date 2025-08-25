@@ -100,6 +100,20 @@ with app.app_context():
             print(f"❌ Failed to add slideshow column: {alter_error}")
             db.session.rollback()
     
+    # Add is_about column if it doesn't exist
+    try:
+        # Check if is_about column exists
+        db.engine.execute("SELECT is_about FROM images LIMIT 1")
+        print("✅ is_about column already exists")
+    except Exception:
+        try:
+            # Add the is_about column to existing database
+            db.engine.execute("ALTER TABLE images ADD COLUMN is_about BOOLEAN DEFAULT 0")
+            print("✅ Added is_about column to existing database")
+        except Exception as alter_error:
+            print(f"❌ Failed to add is_about column: {alter_error}")
+            db.session.rollback()
+    
     # Only migrate images if no images exist in database
     try:
         if Image.query.count() == 0:
@@ -108,9 +122,8 @@ with app.app_context():
         else:
             print(f"✅ Database has {Image.query.count()} images - skipping migration")
     except Exception as e:
-        print(f"⚠️ Database schema issue, creating fresh database: {e}")
-        db.create_all()
-        print("✅ Fresh database created with new schema")
+        print(f"⚠️ Database query issue: {e}")
+        # Don't create fresh database - just continue
     
     print("✅ SQL Database initialization complete")
 
