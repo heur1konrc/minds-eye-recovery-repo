@@ -859,56 +859,20 @@ def serve_data_file(filename):
 
 @app.route('/about')
 def about_page():
-    """Unified About page using Image table with is_about flag"""
+    """Clean About page using Image table with is_about flag"""
     try:
-        # Get About images from the unified Image table
         from src.models import Image
         about_images = Image.query.filter(Image.is_about == True).order_by(Image.display_order.asc(), Image.upload_date.asc()).all()
-        
-        # Get the first About image for inline display
         first_about_image = about_images[0] if about_images else None
         
-        # Generate the image HTML based on whether an image exists
         if first_about_image:
-            image_html = f'''
-                            <img src="/data/{first_about_image.filename}" 
-                                 alt="{first_about_image.title}"
-                                 class="w-full h-full object-cover">
-            '''
+            image_html = f'<img src="/data/{first_about_image.filename}" alt="{first_about_image.title}" class="w-full h-full object-cover">'
             image_title = first_about_image.title
         else:
-            image_html = '''
-                            <div class="w-full h-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
-                                <p class="text-white text-center font-semibold">Behind the Lens Image<br/>Will appear here once uploaded</p>
-                            </div>
-            '''
+            image_html = '<div class="w-full h-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center"><p class="text-white text-center font-semibold">Behind the Lens Image<br/>Will appear here once uploaded</p></div>'
             image_title = "Behind the Lens"
         
-        # Professional bio content
-        bio_content = """
-        Born and raised right here in Madison, Wisconsin, I'm a creative spirit with a passion for bringing visions to life. My journey has woven through various rewarding paths – as a <strong>musician/songwriter</strong>, a <strong>Teacher</strong>, a <strong>REALTOR</strong>, and a <strong>Small Business Owner</strong>. Each of these roles has fueled my inspired, creative, and driven approach to everything I do, especially when it comes to photography.
-
-        At the heart of Mind's Eye Photography: Where Moments Meet Imagination is my dedication to you. While I cherish the fulfillment of capturing moments that spark my own imagination, my true passion lies in doing the same for my clients. Based in Madison, I frequently travel across the state, always on the lookout for that next inspiring scene.
-
-        For me, client satisfaction isn't just a goal – it's the foundation of every interaction. I pour my energy into ensuring you not only love your photos but also enjoy the entire experience. It's truly rewarding to see clients transform into lifelong friends, and that's the kind of connection I strive to build with everyone I work with.
-        """
-        
-        # Additional About images for bottom gallery
-        additional_images = about_images[1:] if len(about_images) > 1 else []
-        additional_images_html = ""
-        if additional_images:
-            additional_images_html = "<h3>More Behind the Scenes</h3><div class='about-gallery'>"
-            for img in additional_images:
-                additional_images_html += f'''
-                    <div class="about-gallery-item">
-                        <img src="/static/assets/{img.filename}" alt="{img.title}">
-                        <p>{img.title}</p>
-                    </div>
-                '''
-            additional_images_html += "</div>"
-
-        return f'''
-<!DOCTYPE html>
+        return f'''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -916,73 +880,44 @@ def about_page():
     <title>About - Mind's Eye Photography</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-            min-height: 100vh;
-        }
-        .about-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .about-gallery-item img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
+        body {{ background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%); min-height: 100vh; }}
     </style>
 </head>
 <body class="text-white">
-    <!-- Navigation -->
     <nav class="bg-black bg-opacity-50 p-4">
         <div class="container mx-auto flex justify-between items-center">
             <a href="/" class="text-2xl font-bold text-orange-400">Mind's Eye Photography</a>
             <div class="space-x-6">
-                <a href="/" class="hover:text-orange-400">Home</a>
-                <a href="/portfolio" class="hover:text-orange-400">Portfolio</a>
-                <a href="/featured" class="hover:text-orange-400">Featured</a>
+                <a href="/" class="hover:text-orange-400 transition-colors">Home</a>
+                <a href="/portfolio" class="hover:text-orange-400 transition-colors">Portfolio</a>
+                <a href="/featured" class="hover:text-orange-400 transition-colors">Featured</a>
                 <a href="/about" class="text-orange-400">About</a>
-                <a href="/contact" class="hover:text-orange-400">Contact</a>
+                <a href="/contact" class="hover:text-orange-400 transition-colors">Contact</a>
             </div>
         </div>
     </nav>
-
-    <!-- About Content -->
     <div class="container mx-auto px-4 py-12">
         <h1 class="text-5xl font-bold text-center text-orange-400 mb-4">About Mind's Eye Photography</h1>
         <p class="text-xl text-center text-gray-300 mb-12">Where Moments Meet Imagination</p>
-        
         <div class="max-w-4xl mx-auto">
-            <!-- Image floated left with text wrapping around it -->
             <div class="float-left mr-6 mb-4 w-80 h-52 rounded-lg overflow-hidden shadow-2xl">
                 {image_html}
             </div>
             <p class="text-center text-orange-400 font-semibold mb-4">{image_title}</p>
-            
-            <!-- Bio text that wraps around the floated image -->
             <div class="text-lg leading-relaxed">
-                {bio_content}
-                
+                <p class="mb-6">Born and raised right here in Madison, Wisconsin, I'm a creative spirit with a passion for bringing visions to life. My journey has woven through various rewarding paths – as a <strong>musician/songwriter</strong>, a <strong>Teacher</strong>, a <strong>REALTOR</strong>, and a <strong>Small Business Owner</strong>. Each of these roles has fueled my inspired, creative, and driven approach to everything I do, especially when it comes to photography.</p>
+                <p class="mb-6">At the heart of Mind's Eye Photography: Where Moments Meet Imagination is my dedication to you. While I cherish the fulfillment of capturing moments that spark my own imagination, my true passion lies in doing the same for my clients. Based in Madison, I frequently travel across the state, always on the lookout for that next inspiring scene.</p>
+                <p class="mb-6">For me, client satisfaction isn't just a goal – it's the foundation of every interaction. I pour my energy into ensuring you not only love your photos but also enjoy the entire experience. It's truly rewarding to see clients transform into lifelong friends, and that's the kind of connection I strive to build with everyone I work with.</p>
                 <p class="text-right text-orange-400 font-semibold text-xl mt-8">Rick Corey</p>
             </div>
-            
-            <!-- Clear float -->
             <div class="clear-both"></div>
         </div>
-        
-        <!-- Additional Images -->
-        {additional_images_html}
     </div>
 </body>
-</html>
-        '''
-        return html_content
-        
+</html>'''
     except Exception as e:
-        print(f"Error in about page: {e}")
-        return f"Error loading about page: {str(e)}", 500
+        return f"Error: {str(e)}", 500
+
 
 
 @app.route('/about-old')
