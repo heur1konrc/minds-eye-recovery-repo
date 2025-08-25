@@ -866,7 +866,7 @@ def about_page():
         first_about_image = about_images[0] if about_images else None
         
         if first_about_image:
-            image_html = f'<img src="/data/{first_about_image.filename}" alt="{first_about_image.title}" class="w-full h-full object-cover">'
+            image_html = f'<img src="/static/assets/{first_about_image.filename}" alt="{first_about_image.title}" class="w-full h-full object-cover">'
             image_title = first_about_image.title
         else:
             image_html = '<div class="w-full h-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center"><p class="text-white text-center font-semibold">Behind the Lens Image<br/>Will appear here once uploaded</p></div>'
@@ -879,12 +879,8 @@ def about_page():
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - Mind's Eye Photography</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {{ background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%); min-height: 100vh; }}
-    </style>
 </head>
-<body class="text-white">
-    <nav class="bg-black bg-opacity-50 p-4">
+<body class="bg-slate-900 text-white min-h-screen">'    <nav class="bg-black bg-opacity-50 p-4">
         <div class="container mx-auto flex justify-between items-center">
             <a href="/" class="text-2xl font-bold text-orange-400">Mind's Eye Photography</a>
             <div class="space-x-6">
