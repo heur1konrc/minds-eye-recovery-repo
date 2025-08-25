@@ -3,7 +3,7 @@ import json
 import uuid
 import os
 from datetime import datetime
-from flask import Blueprint, request, render_template_string, redirect, url_for, session, flash
+from flask import Blueprint, request, render_template_string, redirect, url_for, session, flash, jsonify
 from werkzeug.utils import secure_filename
 from ..config import PHOTOGRAPHY_ASSETS_DIR, PORTFOLIO_DATA_FILE, CATEGORIES_CONFIG_FILE, get_image_url
 
