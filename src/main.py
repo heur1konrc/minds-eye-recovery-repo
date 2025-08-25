@@ -803,17 +803,17 @@ def about_page_override():
 @app.route('/assets/<path:filename>')
 def serve_react_assets(filename):
     """Serve React build assets (CSS, JS, etc.)"""
-    frontend_assets = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist', 'assets')
-    if os.path.exists(os.path.join(frontend_assets, filename)):
-        return send_from_directory(frontend_assets, filename)
+    static_assets = os.path.join(os.path.dirname(__file__), 'static', 'assets')
+    if os.path.exists(os.path.join(static_assets, filename)):
+        return send_from_directory(static_assets, filename)
     return f"React asset not found: {filename}", 404
 
 @app.route('/')
 def serve_react_root():
     """Serve React frontend for root route"""
-    frontend_dist = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist')
-    if os.path.exists(os.path.join(frontend_dist, 'index.html')):
-        return send_from_directory(frontend_dist, 'index.html')
+    static_dir = os.path.join(os.path.dirname(__file__), 'static')
+    if os.path.exists(os.path.join(static_dir, 'index.html')):
+        return send_from_directory(static_dir, 'index.html')
     return "React frontend not found", 404
 
 @app.route('/<path:path>')
@@ -831,13 +831,13 @@ def serve_react_app(path):
         abort(404)
     
     # Check if it's a specific file request
-    frontend_dist = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist')
-    if '.' in path and os.path.exists(os.path.join(frontend_dist, path)):
-        return send_from_directory(frontend_dist, path)
+    static_dir = os.path.join(os.path.dirname(__file__), 'static')
+    if '.' in path and os.path.exists(os.path.join(static_dir, path)):
+        return send_from_directory(static_dir, path)
     
     # For all other routes (React SPA routes), serve React index.html
-    if os.path.exists(os.path.join(frontend_dist, 'index.html')):
-        return send_from_directory(frontend_dist, 'index.html')
+    if os.path.exists(os.path.join(static_dir, 'index.html')):
+        return send_from_directory(static_dir, 'index.html')
     return "React frontend not found", 404
 
 if __name__ == '__main__':
