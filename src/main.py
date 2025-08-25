@@ -880,7 +880,9 @@ def about_page():
     <title>About - Mind's Eye Photography</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-white min-h-screen">'    <nav class="bg-black bg-opacity-50 p-4">
+<body class="bg-slate-900 text-white min-h-screen">
+    <div class="pt-20">
+    <nav class="bg-black bg-opacity-50 p-4">
         <div class="container mx-auto flex justify-between items-center">
             <a href="/" class="text-2xl font-bold text-orange-500">Mind's Eye Photography</a>
             <div class="space-x-6">
@@ -896,7 +898,7 @@ def about_page():
         <h1 class="text-5xl font-bold text-center mb-4 text-orange-500">About Mind's Eye Photography</h1>
         <p class="text-xl text-center text-gray-300 mb-12">Where Moments Meet Imagination</p>
         <div class="max-w-4xl mx-auto">
-            <div class="float-left mr-6 mb-4 w-80 h-52 rounded-lg overflow-hidden shadow-2xl">
+            <div class="float-left mr-6 mb-4 w-96 h-64 rounded-lg overflow-hidden shadow-2xl">
                 {image_html}
             </div>
             <p class="text-center font-semibold mb-4 text-orange-400">{image_title}</p>
