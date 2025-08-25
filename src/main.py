@@ -898,7 +898,7 @@ def about_page():
         <h1 class="text-5xl font-bold text-center mb-4 text-orange-500">About Mind's Eye Photography</h1>
         <p class="text-xl text-center text-gray-300 mb-12">Where Moments Meet Imagination</p>
         <div class="max-w-4xl mx-auto">
-            <div class="float-left mr-6 mb-4 w-96 h-64 rounded-lg overflow-hidden shadow-2xl">
+            <div class="float-left mr-6 mb-4 w-[500px] h-[333px] rounded-lg overflow-hidden shadow-2xl">
                 {image_html}
             </div>
             <p class="text-center font-semibold mb-4 text-orange-400">{image_title}</p>
