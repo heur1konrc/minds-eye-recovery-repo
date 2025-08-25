@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Mind's Eye Photography</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white">
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-50 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-orange-500 text-xl font-bold">Mind's Eye Photography</a>
+                </div>
+                <div class="flex space-x-8">
+                    <a href="/" class="text-white hover:text-orange-500 transition-colors">Home</a>
+                    <a href="/portfolio" class="text-orange-500 font-semibold">Portfolio</a>
+                    <a href="/featured" class="text-white hover:text-orange-500 transition-colors">Featured</a>
+                    <a href="/about" class="text-white hover:text-orange-500 transition-colors">About</a>
+                    <a href="/contact" class="text-white hover:text-orange-500 transition-colors">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-6xl font-bold text-orange-500 mb-4">Portfolio</h1>
+                <p class="text-xl text-gray-300">Explore my collection of {{ image_count }} professional photographs</p>
+            </div>
+
+            <!-- Image Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {% for image in images %}
+                <div class="bg-slate-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div class="aspect-square overflow-hidden">
+                        <img 
+                            src="/static/assets/{{ image.filename }}" 
+                            alt="{{ image.title }}"
+                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                        >
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-white mb-2">{{ image.title }}</h3>
+                        {% if image.description %}
+                        <p class="text-gray-400 text-sm">{{ image.description }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if not images %}
+            <div class="text-center py-12">
+                <p class="text-gray-400 text-xl">No images found in portfolio</p>
+                <p class="text-gray-500 mt-2">Please add images through the admin panel</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+
