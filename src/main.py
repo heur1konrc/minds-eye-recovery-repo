@@ -882,7 +882,6 @@ def about_page():
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 text-white min-h-screen">
-    <div class="pt-20">
     <nav class="bg-black bg-opacity-50 p-4">
         <div class="container mx-auto flex justify-between items-center">
             <a href="/" class="text-2xl font-bold text-orange-500">Mind's Eye Photography</a>
@@ -911,7 +910,6 @@ def about_page():
             </div>
             <div class="clear-both"></div>
         </div>
-    </div>
     </div>
 </body>
 </html>'''
