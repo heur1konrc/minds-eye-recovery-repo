@@ -882,29 +882,29 @@ def about_page():
 </head>
 <body class="bg-slate-900 text-white min-h-screen">'    <nav class="bg-black bg-opacity-50 p-4">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="/" class="text-2xl font-bold text-orange-400">Mind's Eye Photography</a>
+            <a href="/" class="text-2xl font-bold text-orange-500">Mind's Eye Photography</a>
             <div class="space-x-6">
                 <a href="/" class="hover:text-orange-400 transition-colors">Home</a>
                 <a href="/portfolio" class="hover:text-orange-400 transition-colors">Portfolio</a>
                 <a href="/featured" class="hover:text-orange-400 transition-colors">Featured</a>
-                <a href="/about" class="text-orange-400">About</a>
+                <a href="/about" class="text-orange-500">About</a>
                 <a href="/contact" class="hover:text-orange-400 transition-colors">Contact</a>
             </div>
         </div>
     </nav>
     <div class="container mx-auto px-4 py-12">
-        <h1 class="text-5xl font-bold text-center text-orange-400 mb-4">About Mind's Eye Photography</h1>
+        <h1 class="text-5xl font-bold text-center mb-4 text-orange-500">About Mind's Eye Photography</h1>
         <p class="text-xl text-center text-gray-300 mb-12">Where Moments Meet Imagination</p>
         <div class="max-w-4xl mx-auto">
             <div class="float-left mr-6 mb-4 w-80 h-52 rounded-lg overflow-hidden shadow-2xl">
                 {image_html}
             </div>
-            <p class="text-center text-orange-400 font-semibold mb-4">{image_title}</p>
+            <p class="text-center font-semibold mb-4 text-orange-400">{image_title}</p>
             <div class="text-lg leading-relaxed">
                 <p class="mb-6">Born and raised right here in Madison, Wisconsin, I'm a creative spirit with a passion for bringing visions to life. My journey has woven through various rewarding paths – as a <strong>musician/songwriter</strong>, a <strong>Teacher</strong>, a <strong>REALTOR</strong>, and a <strong>Small Business Owner</strong>. Each of these roles has fueled my inspired, creative, and driven approach to everything I do, especially when it comes to photography.</p>
                 <p class="mb-6">At the heart of Mind's Eye Photography: Where Moments Meet Imagination is my dedication to you. While I cherish the fulfillment of capturing moments that spark my own imagination, my true passion lies in doing the same for my clients. Based in Madison, I frequently travel across the state, always on the lookout for that next inspiring scene.</p>
                 <p class="mb-6">For me, client satisfaction isn't just a goal – it's the foundation of every interaction. I pour my energy into ensuring you not only love your photos but also enjoy the entire experience. It's truly rewarding to see clients transform into lifelong friends, and that's the kind of connection I strive to build with everyone I work with.</p>
-                <p class="text-right text-orange-400 font-semibold text-xl mt-8">Rick Corey</p>
+                <p class="text-right font-semibold text-xl mt-8 text-orange-400">Rick Corey</p>
             </div>
             <div class="clear-both"></div>
         </div>
