@@ -911,6 +911,7 @@ def about_page():
             <div class="clear-both"></div>
         </div>
     </div>
+    </div>
 </body>
 </html>'''
     except Exception as e:
