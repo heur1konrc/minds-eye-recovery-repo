@@ -916,22 +916,22 @@ def about_page():
     <title>About - Mind's Eye Photography</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {{
-            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #7c3aed 100%);
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
             min-height: 100vh;
-        }}
-        .about-gallery {{
+        }
+        .about-gallery {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-top: 20px;
-        }}
-        .about-gallery-item img {{
+        }
+        .about-gallery-item img {
             width: 100%;
             height: 150px;
             object-fit: cover;
             border-radius: 8px;
-        }}
+        }
     </style>
 </head>
 <body class="text-white">
@@ -956,7 +956,7 @@ def about_page():
         
         <div class="max-w-4xl mx-auto">
             <!-- Image floated left with text wrapping around it -->
-            <div class="float-left mr-6 mb-4 w-80 h-96 rounded-lg overflow-hidden shadow-2xl">
+            <div class="float-left mr-6 mb-4 w-80 h-52 rounded-lg overflow-hidden shadow-2xl">
                 {image_html}
             </div>
             <p class="text-center text-orange-400 font-semibold mb-4">{image_title}</p>
