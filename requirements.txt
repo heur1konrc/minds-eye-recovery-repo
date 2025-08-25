@@ -10,4 +10,5 @@ Flask-SQLAlchemy==3.1.1
 SQLAlchemy==2.0.23
 python-dotenv==1.0.0
 Pillow==10.0.0
+flask-cors==4.0.0
 
