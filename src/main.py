@@ -170,13 +170,17 @@ def serve_photography_assets(filename):
 def get_simple_portfolio():
     """Simple portfolio endpoint using same pattern as working debug endpoint"""
     try:
+        print("🔍 Simple Portfolio API called")
         from src.models import Image
         
         # Get all images - same as debug endpoint
         all_images = Image.query.all()
+        print(f"📊 Found {len(all_images)} images in database")
+        
         portfolio_data = []
         
         for image in all_images:
+            print(f"📷 Processing image: {image.filename}")
             # Simple portfolio item without complex relationships
             portfolio_item = {
                 'id': str(image.id),
@@ -191,10 +195,13 @@ def get_simple_portfolio():
             }
             portfolio_data.append(portfolio_item)
         
+        print(f"✅ Returning {len(portfolio_data)} portfolio items")
         return jsonify(portfolio_data)
         
     except Exception as e:
-        print(f"Error in simple portfolio: {e}")
+        print(f"❌ Error in simple portfolio: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify([]), 500
 
 @app.route('/api/categories')
