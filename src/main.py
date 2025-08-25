@@ -166,6 +166,11 @@ def serve_photography_assets(filename):
             return send_from_directory(old_assets_dir, filename)
         return f"Image not found. Checked: {PHOTOGRAPHY_ASSETS_DIR}/{filename} and {old_assets_dir}/{filename}", 404
 
+@app.route('/test-portfolio')
+def test_portfolio():
+    """Test portfolio page to debug image display"""
+    return send_from_directory('static', 'test-portfolio.html')
+
 @app.route('/api/simple-portfolio')
 def get_simple_portfolio():
     """Simple portfolio endpoint using same pattern as working debug endpoint"""
