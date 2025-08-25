@@ -723,6 +723,25 @@ dashboard_html = '''
         .slideshow-btn.active:hover {
             background: #e55a2b;
         }
+        .about-btn {
+            background: #666;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .about-btn:hover {
+            background: #777;
+        }
+        .about-btn.active {
+            background: #2196F3;
+            color: #fff;
+        }
+        .about-btn.active:hover {
+            background: #1976D2;
+        }
         .message { 
             padding: 15px; 
             border-radius: 5px; 
@@ -884,6 +903,9 @@ dashboard_html = '''
                         <button type="button" class="edit-btn" onclick="openEditModal('{{ item.id }}', '{{ item.title|replace("'", "\\'") }}', '{{ item.description|replace("'", "\\'") }}')">Edit</button>
                         <button type="button" class="slideshow-btn {{ 'active' if item.is_slideshow_background else '' }}" onclick="toggleSlideshow('{{ item.id }}', {{ 'true' if item.is_slideshow_background else 'false' }})">
                             {{ '★ In Slideshow' if item.is_slideshow_background else '☆ Add to Slideshow' }}
+                        </button>
+                        <button type="button" class="about-btn {{ 'active' if item.is_about else '' }}" onclick="toggleAbout('{{ item.id }}', {{ 'true' if item.is_about else 'false' }})">
+                            {{ '📖 About Image' if item.is_about else '📖 Set as About' }}
                         </button>
                         <form method="POST" action="/admin/delete" style="display: inline;">
                             <input type="hidden" name="image_id" value="{{ item.id }}">
@@ -1068,10 +1090,80 @@ dashboard_html = '''
                 alert('Error updating slideshow status: ' + error.message);
             }
         }
+        
+        // About toggle functionality
+        async function toggleAbout(imageId, currentStatus) {
+            try {
+                const response = await fetch('/admin/about-toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image_id: imageId,
+                        is_about: !currentStatus
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`HTTP error! status: ${response.status}, error: ${errorData.error || 'Unknown error'}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Success: ${result.message}`);
+                    location.reload();
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error toggling about status:', error);
+                alert('Error updating about status: ' + error.message);
+            }
+        }
     </script>
 </body>
 </html>
 '''
+
+
+@admin_bp.route('/admin/about-toggle', methods=['POST'])
+def about_toggle():
+    """Toggle about status for an image"""
+    if 'admin_logged_in' not in session:
+        return jsonify({'success': False, 'error': 'Not authenticated'}), 401
+    
+    try:
+        from ..models import Image, db
+        
+        data = request.get_json()
+        image_id = data.get('image_id')
+        is_about = data.get('is_about', False)
+        
+        if not image_id:
+            return jsonify({'success': False, 'error': 'Image ID is required'}), 400
+        
+        # Get the image
+        image = Image.query.get(image_id)
+        if not image:
+            return jsonify({'success': False, 'error': 'Image not found'}), 404
+        
+        # Update about status
+        image.is_about = is_about
+        db.session.commit()
+        
+        status_text = "added to About page" if is_about else "removed from About page"
+        return jsonify({
+            'success': True, 
+            'message': f'Image "{image.title}" {status_text}',
+            'is_about': is_about
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @admin_bp.route('/about-management')

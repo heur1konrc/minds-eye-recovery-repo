@@ -101,11 +101,16 @@ with app.app_context():
             db.session.rollback()
     
     # Only migrate images if no images exist in database
-    if Image.query.count() == 0:
-        print("🔄 No images in database - running migration...")
-        migrate_existing_images()
-    else:
-        print(f"✅ Database has {Image.query.count()} images - skipping migration")
+    try:
+        if Image.query.count() == 0:
+            print("🔄 No images in database - running migration...")
+            migrate_existing_images()
+        else:
+            print(f"✅ Database has {Image.query.count()} images - skipping migration")
+    except Exception as e:
+        print(f"⚠️ Database schema issue, creating fresh database: {e}")
+        db.create_all()
+        print("✅ Fresh database created with new schema")
     
     print("✅ SQL Database initialization complete")
 
@@ -114,6 +119,12 @@ def serve_about_image(filename):
     """Serve about images from the about directory"""
     about_dir = os.path.join(PHOTOGRAPHY_ASSETS_DIR, 'about')
     return send_from_directory(about_dir, filename)
+
+@app.route('/data/<filename>')
+def serve_data_image(filename):
+    """Serve images from the data directory (portfolio and about images)"""
+    data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
+    return send_from_directory(data_dir, filename)
 
 @app.route('/debug/database-info')
 def debug_database_info():
@@ -816,7 +827,28 @@ def flask_diagnostic():
 @app.route('/about')
 def about_page_override():
     """Serve floating layout About page directly from Flask - BYPASSES REACT CACHE"""
-    html_content = '''
+    
+    # Get the first About image from admin system
+    from src.models import AboutImage
+    about_image = AboutImage.query.order_by(AboutImage.display_order.asc(), AboutImage.upload_date.asc()).first()
+    
+    # Generate the image HTML based on whether an image exists
+    if about_image:
+        image_html = f'''
+                        <img src="/data/{about_image.filename}" 
+                             alt="{about_image.title}"
+                             class="w-full h-full object-cover">
+        '''
+        image_title = about_image.title
+    else:
+        image_html = '''
+                        <div class="w-full h-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
+                            <p class="text-white text-center font-semibold">Behind the Lens Image<br/>Upload image in admin</p>
+                        </div>
+        '''
+        image_title = "Behind the Lens"
+    
+    html_content = f'''
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -825,25 +857,25 @@ def about_page_override():
     <title>About - Mind's Eye Photography</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .floating-image {
+        .floating-image {{
             float: left;
             margin-right: 2rem;
             margin-bottom: 1.5rem;
             width: 320px;
-        }
-        @media (min-width: 1024px) {
-            .floating-image {
+        }}
+        @media (min-width: 1024px) {{
+            .floating-image {{
                 width: 384px;
-            }
-        }
-        .clear-float {
+            }}
+        }}
+        .clear-float {{
             clear: both;
-        }
-        body {
+        }}
+        body {{
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
             color: #e2e8f0;
             font-family: system-ui, -apple-system, sans-serif;
-        }
+        }}
     </style>
 </head>
 <body class="min-h-screen">
@@ -882,12 +914,10 @@ def about_page_override():
                 <!-- Floating Behind the Lens Image -->
                 <div class="floating-image">
                     <div class="bg-slate-800 rounded-lg overflow-hidden shadow-2xl" style="aspect-ratio: 3/2;">
-                        <div class="w-full h-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
-                            <p class="text-white text-center font-semibold">Behind the Lens Image<br/>Will appear here once uploaded</p>
-                        </div>
+                        {image_html}
                     </div>
                     <p class="text-center text-orange-400 text-sm mt-3 font-light">
-                        Behind the Lens
+                        {image_title}
                     </p>
                 </div>
                 
@@ -965,4 +995,46 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
+
+
+@app.route("/api/database-inspect")
+def database_inspect():
+    """Inspect what is actually in the database"""
+    try:
+        result = {
+            "images_table": [],
+            "about_images_table": [],
+            "image_count": 0,
+            "about_image_count": 0
+        }
+        
+        # Check main images table
+        images = Image.query.all()
+        result["image_count"] = len(images)
+        for img in images:
+            result["images_table"].append({
+                "id": img.id,
+                "filename": img.filename,
+                "title": img.title,
+                "description": img.description
+            })
+        
+        # Check about images table  
+        try:
+            from src.models import AboutImage
+            about_images = AboutImage.query.all()
+            result["about_image_count"] = len(about_images)
+            for img in about_images:
+                result["about_images_table"].append({
+                    "id": img.id,
+                    "filename": img.filename,
+                    "title": img.title,
+                    "description": img.description
+                })
+        except:
+            result["about_images_table"] = ["AboutImage table not found"]
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
