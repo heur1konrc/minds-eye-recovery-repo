@@ -268,6 +268,49 @@ def get_simple_portfolio():
         print("🔄 Returning empty array as fallback")
         return jsonify([]), 200
 
+@app.route('/api/about-content')
+def get_about_content():
+    """Get about page content from admin system"""
+    try:
+        # Query the about content from the database
+        # This should connect to your admin's about content management
+        from src.models import AboutContent
+        about = AboutContent.query.first()
+        if about:
+            return jsonify({
+                'content': about.content,
+                'updated_at': about.updated_at.isoformat() if about.updated_at else None
+            })
+        else:
+            return jsonify({'content': ''})
+    except Exception as e:
+        print(f"Error fetching about content: {e}")
+        return jsonify({'content': ''})
+
+@app.route('/api/about-images')
+def get_about_images():
+    """Get about page images from admin system"""
+    try:
+        # Query images that are designated for the about page
+        images = Image.query.filter(
+            Image.categories.any(Category.name.in_(['About', 'Bio', 'Behind the Lens']))
+        ).all()
+        
+        result = []
+        for image in images:
+            result.append({
+                'id': image.id,
+                'title': image.title,
+                'filename': image.filename,
+                'description': image.description or '',
+                'categories': [cat.name for cat in image.categories]
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        print(f"Error fetching about images: {e}")
+        return jsonify([])
+
 @app.route('/api/categories')
 def get_categories():
     """API endpoint to get all categories"""
