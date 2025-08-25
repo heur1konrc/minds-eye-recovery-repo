@@ -1,0 +1,167 @@
+[
+  {
+    "id": "chichi",
+    "title": "Chichi",
+    "description": "Beloved pet portrait",
+    "image": "chichi-BvVKxXe6.jpg",
+    "categories": [
+      "Wildlife",
+      "Portraits",
+      "Pets"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "crane1",
+    "title": "Crane",
+    "description": "Elegant crane in natural habitat",
+    "image": "crane1-CRb2bnVt.jpg",
+    "categories": [
+      "Wildlife",
+      "Nature",
+      "Birds"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "crane2",
+    "title": "Crane Pair",
+    "description": "Two cranes in the field",
+    "image": "crane2-DjTCqNNM.jpg",
+    "categories": [
+      "Wildlife",
+      "Nature",
+      "Birds"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "downy-woodpecker",
+    "title": "Downy Woodpecker",
+    "description": "Small woodpecker on tree",
+    "image": "downy-woodpecker-YkHrJYdp.jpg",
+    "categories": [
+      "Wildlife",
+      "Nature",
+      "Birds"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "duck-on-water",
+    "title": "Duck on Water",
+    "description": "Peaceful duck swimming",
+    "image": "duck-on-water-CCbH0luC.jpg",
+    "categories": [
+      "Wildlife",
+      "Nature",
+      "Birds"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "duck-on-water2",
+    "title": "Duck Family",
+    "description": "Ducks enjoying the water",
+    "image": "duck-on-water2-DSQYVtTP.jpg",
+    "categories": [
+      "Wildlife",
+      "Nature",
+      "Birds"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "female-red-winged-blackbird",
+    "title": "Female Red-winged Blackbird",
+    "description": "Beautiful songbird portrait",
+    "image": "female-red-winged-blackbird-CXnQkF49.jpg",
+    "categories": [
+      "Wildlife",
+      "Nature",
+      "Birds"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "house-sparrow",
+    "title": "House Sparrow",
+    "description": "Common sparrow in natural setting",
+    "image": "house-sparrow-RunL5DD3.jpg",
+    "categories": [
+      "Wildlife",
+      "Nature",
+      "Birds"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "rabbit1",
+    "title": "Rabbit",
+    "description": "Wild rabbit in meadow",
+    "image": "rabbit1-BQ-gwvBo.jpg",
+    "categories": [
+      "Wildlife",
+      "Nature",
+      "Birds"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "rabbit2",
+    "title": "Rabbit Portrait",
+    "description": "Close-up rabbit study",
+    "image": "rabbit2-DwS531OK.jpg",
+    "categories": [
+      "Wildlife",
+      "Portraits"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "rabbit3",
+    "title": "Rabbit in Field",
+    "description": "Rabbit in natural environment",
+    "image": "rabbit3-DVC3HoUT.jpg",
+    "categories": [
+      "Wildlife",
+      "Nature",
+      "Birds"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "starling",
+    "title": "Starling",
+    "description": "Starling bird photography",
+    "image": "starling-Cok-Y94w.jpg",
+    "categories": [
+      "Wildlife",
+      "Nature",
+      "Birds"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "turkey2",
+    "title": "Lazy Turkey",
+    "description": "Turkey relaxing in natural habitat",
+    "image": "turkey2-DWNI4Ycz.jpg",
+    "categories": [
+      "Wildlife",
+      "Nature",
+      "Birds"
+    ],
+    "created_at": "2025-07-31T00:00:00"
+  },
+  {
+    "id": "madison-skyline",
+    "title": "Madison Skyline",
+    "description": "Downtown Madison, Wisconsin skyline on Lake Monona",
+    "image": "madison-skyline-landscape.jpg",
+    "categories": [
+      "Landscapes"
+    ],
+    "created_at": "2025-08-03T00:00:00"
+  }
+]

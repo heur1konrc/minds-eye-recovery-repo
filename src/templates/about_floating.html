@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Mind's Eye Photography</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .floating-image {
+            float: left;
+            margin-right: 2rem;
+            margin-bottom: 1.5rem;
+            width: 320px;
+        }
+        @media (min-width: 1024px) {
+            .floating-image {
+                width: 384px;
+            }
+        }
+        .clear-float {
+            clear: both;
+        }
+        body {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-slate-900 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <a href="/" class="text-orange-400 text-xl font-bold">Mind's Eye Photography</a>
+                <div class="flex space-x-6">
+                    <a href="/" class="text-slate-300 hover:text-orange-400">Home</a>
+                    <a href="/portfolio" class="text-slate-300 hover:text-orange-400">Portfolio</a>
+                    <a href="/featured" class="text-slate-300 hover:text-orange-400">Featured</a>
+                    <a href="/about" class="text-orange-400">About</a>
+                    <a href="/contact" class="text-slate-300 hover:text-orange-400">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="min-h-screen bg-gradient-to-br from-slate-800 to-slate-900">
+        <!-- Header -->
+        <div class="text-center py-16">
+            <h1 class="text-4xl lg:text-5xl font-light text-orange-400 mb-4">
+                About Mind's Eye Photography
+            </h1>
+            <p class="text-xl text-slate-300">
+                Where Moments Meet Imagination
+            </p>
+        </div>
+
+        <!-- Content with Floating Image -->
+        <div class="max-w-4xl mx-auto px-6 py-16">
+            <div class="prose prose-lg prose-invert max-w-none">
+                <div class="text-slate-300 leading-relaxed text-lg">
+                    
+                    <!-- Floating Behind the Lens Image (Static for now) -->
+                    <div class="floating-image">
+                        <div class="bg-slate-800 rounded-lg overflow-hidden shadow-2xl" style="aspect-ratio: 3/2;">
+                            <div class="w-full h-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
+                                <p class="text-white text-center">Behind the Lens Image<br/>Will appear here once uploaded</p>
+                            </div>
+                        </div>
+                        <p class="text-center text-orange-400 text-sm mt-3 font-light">
+                            Behind the Lens
+                        </p>
+                    </div>
+                    
+                    <!-- Text content that wraps around the floating image -->
+                    <div>
+                        <p class="mb-6">
+                            Born and raised right here in Madison, Wisconsin, I'm a creative spirit with a passion for bringing visions to life. My journey has woven through various rewarding paths – as a <strong>musician/songwriter</strong>, a <strong>Teacher</strong>, a <strong>REALTOR</strong>, and a <strong>Small Business Owner</strong>. Each of these roles has fueled my inspired, creative, and driven approach to everything I do, especially when it comes to photography.
+                        </p>
+                        
+                        <p class="mb-6">
+                            At the heart of Mind's Eye Photography: Where Moments Meet Imagination is my dedication to you. While I cherish the fulfillment of capturing moments that spark my own imagination, my true passion lies in doing the same for my clients. Based in Madison, I frequently travel across the state, always on the lookout for that next inspiring scene.
+                        </p>
+                        
+                        <p class="mb-6">
+                            For me, client satisfaction isn't just a goal – it's the foundation of every interaction. I pour my energy into ensuring you not only love your photos but also enjoy the entire experience. It's truly rewarding to see clients transform into lifelong friends, and that's the kind of connection I strive to build with everyone I work with.
+                        </p>
+                        
+                        <p class="font-semibold">
+                            Rick Corey
+                        </p>
+                    </div>
+                    
+                    <!-- Clear float -->
+                    <div class="clear-float"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

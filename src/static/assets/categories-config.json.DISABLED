@@ -1,0 +1,6 @@
+{
+  "categories": ["Wildlife", "Landscapes", "Portraits", "Events", "Nature", "Miscellaneous", "Birds", "Pets"],
+  "default_category": "All",
+  "category_order": ["Wildlife", "Landscapes", "Portraits", "Events", "Nature", "Miscellaneous", "Birds", "Pets"]
+}
+
