@@ -102,17 +102,25 @@ with app.app_context():
     
     # Add is_about column if it doesn't exist
     try:
-        # Check if is_about column exists
-        db.engine.execute("SELECT is_about FROM images LIMIT 1")
+        # Check if is_about column exists using correct SQLAlchemy syntax
+        with db.engine.connect() as conn:
+            conn.execute(db.text("SELECT is_about FROM images LIMIT 1"))
         print("✅ is_about column already exists")
     except Exception:
         try:
-            # Add the is_about column to existing database
-            db.engine.execute("ALTER TABLE images ADD COLUMN is_about BOOLEAN DEFAULT 0")
+            # Add the is_about column to existing database using correct syntax
+            with db.engine.connect() as conn:
+                conn.execute(db.text("ALTER TABLE images ADD COLUMN is_about BOOLEAN DEFAULT 0"))
+                conn.commit()
             print("✅ Added is_about column to existing database")
         except Exception as alter_error:
             print(f"❌ Failed to add is_about column: {alter_error}")
-            db.session.rollback()
+            # Try creating the table with the new schema
+            try:
+                db.create_all()
+                print("✅ Created tables with new schema")
+            except Exception as create_error:
+                print(f"❌ Failed to create tables: {create_error}")
     
     # Only migrate images if no images exist in database
     try:
