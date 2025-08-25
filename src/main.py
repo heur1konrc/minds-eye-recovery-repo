@@ -166,24 +166,68 @@ def serve_photography_assets(filename):
             return send_from_directory(old_assets_dir, filename)
         return f"Image not found. Checked: {PHOTOGRAPHY_ASSETS_DIR}/{filename} and {old_assets_dir}/{filename}", 404
 
-@app.route('/portfolio-direct')
-def portfolio_direct():
-    """Server-side rendered portfolio page - displays admin images directly"""
+@app.route('/api/slideshow')
+def get_slideshow():
+    """Get slideshow images from admin system"""
     try:
+        print("🎬 Slideshow API called")
         from src.models import Image
         from src.database import db
         
         with app.app_context():
-            all_images = db.session.query(Image).all()
-            print(f"📊 Portfolio Direct: Found {len(all_images)} images")
+            # Get images marked for slideshow from admin
+            slideshow_images = db.session.query(Image).filter(Image.slideshow == True).all()
+            print(f"📊 Found {len(slideshow_images)} slideshow images")
             
-            return render_template('portfolio.html', 
-                                 images=all_images, 
-                                 image_count=len(all_images))
+            slideshow_data = []
+            
+            for image in slideshow_images:
+                print(f"🎬 Processing slideshow image: {image.filename}")
+                slideshow_item = {
+                    'id': str(image.id),
+                    'filename': image.filename,
+                    'title': image.title or f"Slideshow Image {image.id}",
+                    'url': f"/static/assets/{image.filename}"
+                }
+                slideshow_data.append(slideshow_item)
+            
+            print(f"✅ Returning {len(slideshow_data)} slideshow images")
+            return jsonify(slideshow_data)
         
     except Exception as e:
-        print(f"❌ Error in portfolio direct: {e}")
-        return render_template('portfolio.html', images=[], image_count=0)
+        print(f"❌ Error in slideshow API: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify([]), 200
+
+@app.route('/api/slideshow-images')
+def get_slideshow_images():
+    """Alternative slideshow endpoint for compatibility"""
+    try:
+        slideshow_data = []
+        from src.models import Image
+        from src.database import db
+        
+        with app.app_context():
+            slideshow_images = db.session.query(Image).filter(Image.slideshow == True).all()
+            
+            for image in slideshow_images:
+                slideshow_item = {
+                    'id': str(image.id),
+                    'filename': image.filename,
+                    'title': image.title or f"Slideshow Image {image.id}",
+                    'url': f"/static/assets/{image.filename}"
+                }
+                slideshow_data.append(slideshow_item)
+            
+            return jsonify({
+                'success': True,
+                'images': slideshow_data
+            })
+        
+    except Exception as e:
+        print(f"❌ Error in slideshow-images API: {e}")
+        return jsonify({'success': False, 'images': []}), 200
 
 @app.route('/api/simple-portfolio')
 def get_simple_portfolio():
