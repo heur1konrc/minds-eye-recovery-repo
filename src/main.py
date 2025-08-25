@@ -845,6 +845,18 @@ def flask_diagnostic():
     return "FLASK IS WORKING! If you see this, Flask routes work but /about is being hijacked by React routing."
 
 # SPECIAL ABOUT PAGE HANDLER - Bypasses React entirely
+@app.route('/data/<filename>')
+def serve_data_file(filename):
+    """Serve files from the data directory (persistent storage)"""
+    try:
+        # In production, images are stored in /data (persistent volume)
+        data_dir = '/data' if os.path.exists('/data') else os.path.join(os.path.dirname(__file__), '..', 'data')
+        return send_from_directory(data_dir, filename)
+    except Exception as e:
+        print(f"Error serving data file {filename}: {e}")
+        return "File not found", 404
+
+
 @app.route('/about')
 def about_page():
     """Unified About page using Image table with is_about flag"""
@@ -859,7 +871,7 @@ def about_page():
         # Generate the image HTML based on whether an image exists
         if first_about_image:
             image_html = f'''
-                            <img src="/static/assets/{first_about_image.filename}" 
+                            <img src="/data/{first_about_image.filename}" 
                                  alt="{first_about_image.title}"
                                  class="w-full h-full object-cover">
             '''
@@ -942,21 +954,22 @@ def about_page():
         <h1 class="text-5xl font-bold text-center text-orange-400 mb-4">About Mind's Eye Photography</h1>
         <p class="text-xl text-center text-gray-300 mb-12">Where Moments Meet Imagination</p>
         
-        <div class="flex flex-col lg:flex-row gap-12 items-start">
-            <!-- Image Section -->
-            <div class="lg:w-1/3">
-                <div class="w-full h-96 rounded-lg overflow-hidden shadow-2xl">
-                    {image_html}
-                </div>
-                <p class="text-center text-orange-400 font-semibold mt-4">{image_title}</p>
+        <div class="max-w-4xl mx-auto">
+            <!-- Image floated left with text wrapping around it -->
+            <div class="float-left mr-6 mb-4 w-80 h-96 rounded-lg overflow-hidden shadow-2xl">
+                {image_html}
             </div>
+            <p class="text-center text-orange-400 font-semibold mb-4">{image_title}</p>
             
-            <!-- Bio Section -->
-            <div class="lg:w-2/3 space-y-6 text-lg leading-relaxed">
+            <!-- Bio text that wraps around the floated image -->
+            <div class="text-lg leading-relaxed">
                 {bio_content}
                 
                 <p class="text-right text-orange-400 font-semibold text-xl mt-8">Rick Corey</p>
             </div>
+            
+            <!-- Clear float -->
+            <div class="clear-both"></div>
         </div>
         
         <!-- Additional Images -->
