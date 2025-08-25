@@ -171,28 +171,25 @@ def get_slideshow():
     """Get slideshow images from admin system"""
     try:
         print("🎬 Slideshow API called")
-        from src.models import Image
-        from src.database import db
         
-        with app.app_context():
-            # Get images marked for slideshow from admin
-            slideshow_images = db.session.query(Image).filter(Image.slideshow == True).all()
-            print(f"📊 Found {len(slideshow_images)} slideshow images")
-            
-            slideshow_data = []
-            
-            for image in slideshow_images:
-                print(f"🎬 Processing slideshow image: {image.filename}")
-                slideshow_item = {
-                    'id': str(image.id),
-                    'filename': image.filename,
-                    'title': image.title or f"Slideshow Image {image.id}",
-                    'url': f"/static/assets/{image.filename}"
-                }
-                slideshow_data.append(slideshow_item)
-            
-            print(f"✅ Returning {len(slideshow_data)} slideshow images")
-            return jsonify(slideshow_data)
+        # Get images marked for slideshow from admin
+        slideshow_images = Image.query.filter(Image.slideshow == True).all()
+        print(f"📊 Found {len(slideshow_images)} slideshow images")
+        
+        slideshow_data = []
+        
+        for image in slideshow_images:
+            print(f"🎬 Processing slideshow image: {image.filename}")
+            slideshow_item = {
+                'id': str(image.id),
+                'filename': image.filename,
+                'title': image.title or f"Slideshow Image {image.id}",
+                'url': f"/static/assets/{image.filename}"
+            }
+            slideshow_data.append(slideshow_item)
+        
+        print(f"✅ Returning {len(slideshow_data)} slideshow images")
+        return jsonify(slideshow_data)
         
     except Exception as e:
         print(f"❌ Error in slideshow API: {e}")
@@ -205,25 +202,22 @@ def get_slideshow_images():
     """Alternative slideshow endpoint for compatibility"""
     try:
         slideshow_data = []
-        from src.models import Image
-        from src.database import db
         
-        with app.app_context():
-            slideshow_images = db.session.query(Image).filter(Image.slideshow == True).all()
-            
-            for image in slideshow_images:
-                slideshow_item = {
-                    'id': str(image.id),
-                    'filename': image.filename,
-                    'title': image.title or f"Slideshow Image {image.id}",
-                    'url': f"/static/assets/{image.filename}"
-                }
-                slideshow_data.append(slideshow_item)
-            
-            return jsonify({
-                'success': True,
-                'images': slideshow_data
-            })
+        slideshow_images = Image.query.filter(Image.slideshow == True).all()
+        
+        for image in slideshow_images:
+            slideshow_item = {
+                'id': str(image.id),
+                'filename': image.filename,
+                'title': image.title or f"Slideshow Image {image.id}",
+                'url': f"/static/assets/{image.filename}"
+            }
+            slideshow_data.append(slideshow_item)
+        
+        return jsonify({
+            'success': True,
+            'images': slideshow_data
+        })
         
     except Exception as e:
         print(f"❌ Error in slideshow-images API: {e}")
@@ -235,40 +229,35 @@ def get_simple_portfolio():
     try:
         print("🔍 Simple Portfolio API called")
         
-        # Import inside try block to avoid import issues
-        from src.models import Image
-        from src.database import db
+        # Get all images from admin database
+        all_images = Image.query.all()
+        print(f"📊 Found {len(all_images)} images in database")
         
-        # Use db.session for reliable query
-        with app.app_context():
-            all_images = db.session.query(Image).all()
-            print(f"📊 Found {len(all_images)} images in database")
-            
-            portfolio_data = []
-            
-            for image in all_images:
-                print(f"📷 Processing image: {image.filename}")
-                try:
-                    # Create portfolio item with error handling for each field
-                    portfolio_item = {
-                        'id': str(image.id) if image.id else 'unknown',
-                        'title': image.title if image.title else f"Image {image.id}",
-                        'description': image.description if image.description else "",
-                        'filename': image.filename if image.filename else "unknown.jpg",
-                        'image': image.filename if image.filename else "unknown.jpg",
-                        'categories': ['Photography'],  # Simple default
-                        'metadata': {
-                            'created_at': image.created_at.isoformat() if hasattr(image, 'created_at') and image.created_at else None
-                        }
+        portfolio_data = []
+        
+        for image in all_images:
+            print(f"📷 Processing image: {image.filename}")
+            try:
+                # Create portfolio item with error handling for each field
+                portfolio_item = {
+                    'id': str(image.id) if image.id else 'unknown',
+                    'title': image.title if image.title else f"Image {image.id}",
+                    'description': image.description if image.description else "",
+                    'filename': image.filename if image.filename else "unknown.jpg",
+                    'image': image.filename if image.filename else "unknown.jpg",
+                    'categories': ['Photography'],  # Simple default
+                    'metadata': {
+                        'created_at': image.created_at.isoformat() if hasattr(image, 'created_at') and image.created_at else None
                     }
-                    portfolio_data.append(portfolio_item)
-                    print(f"✅ Added image: {portfolio_item['filename']}")
-                except Exception as img_error:
-                    print(f"⚠️ Error processing image {image.id}: {img_error}")
-                    continue
-            
-            print(f"✅ Returning {len(portfolio_data)} portfolio items")
-            return jsonify(portfolio_data)
+                }
+                portfolio_data.append(portfolio_item)
+                print(f"✅ Added image: {portfolio_item['filename']}")
+            except Exception as img_error:
+                print(f"⚠️ Error processing image {image.id}: {img_error}")
+                continue
+        
+        print(f"✅ Returning {len(portfolio_data)} portfolio items")
+        return jsonify(portfolio_data)
         
     except Exception as e:
         print(f"❌ Error in simple portfolio: {e}")
