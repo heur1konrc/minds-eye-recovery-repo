@@ -166,6 +166,37 @@ def serve_photography_assets(filename):
             return send_from_directory(old_assets_dir, filename)
         return f"Image not found. Checked: {PHOTOGRAPHY_ASSETS_DIR}/{filename} and {old_assets_dir}/{filename}", 404
 
+@app.route('/api/simple-portfolio')
+def get_simple_portfolio():
+    """Simple portfolio endpoint using same pattern as working debug endpoint"""
+    try:
+        from src.models import Image
+        
+        # Get all images - same as debug endpoint
+        all_images = Image.query.all()
+        portfolio_data = []
+        
+        for image in all_images:
+            # Simple portfolio item without complex relationships
+            portfolio_item = {
+                'id': str(image.id),
+                'title': image.title or f"Image {image.id}",
+                'description': image.description or "",
+                'filename': image.filename,
+                'image': image.filename,  # Frontend expects 'image' field
+                'categories': ['Photography'],  # Simple default category
+                'metadata': {
+                    'created_at': image.created_at.isoformat() if image.created_at else None
+                }
+            }
+            portfolio_data.append(portfolio_item)
+        
+        return jsonify(portfolio_data)
+        
+    except Exception as e:
+        print(f"Error in simple portfolio: {e}")
+        return jsonify([]), 500
+
 @app.route('/api/categories')
 def get_categories():
     """API endpoint to get all categories"""
