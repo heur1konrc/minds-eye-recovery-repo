@@ -866,7 +866,7 @@ def about_page():
         first_about_image = about_images[0] if about_images else None
         
         if first_about_image:
-            image_html = f'<img src="/static/assets/{first_about_image.filename}" alt="{first_about_image.title}" class="w-full h-full object-cover">'
+            image_html = f'<img src="/data/{first_about_image.filename}" alt="{first_about_image.title}" class="w-full h-full object-cover">'
             image_title = first_about_image.title
         else:
             image_html = '<div class="w-full h-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center"><p class="text-white text-center font-semibold">Behind the Lens Image<br/>Will appear here once uploaded</p></div>'
