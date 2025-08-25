@@ -291,9 +291,15 @@ def get_about_content():
 def get_about_images():
     """Get about page images from admin system"""
     try:
-        # Query images that are designated for the about page
+        # Look for any images that might be About page images
+        # Search by title containing keywords
         images = Image.query.filter(
-            Image.categories.any(Category.name.in_(['About', 'Bio', 'Behind the Lens']))
+            db.or_(
+                Image.title.ilike('%behind%'),
+                Image.title.ilike('%lens%'),
+                Image.title.ilike('%about%'),
+                Image.title.ilike('%bio%')
+            )
         ).all()
         
         result = []
@@ -306,6 +312,7 @@ def get_about_images():
                 'categories': [cat.name for cat in image.categories]
             })
         
+        print(f"🔍 Found {len(result)} about images")
         return jsonify(result)
     except Exception as e:
         print(f"Error fetching about images: {e}")
