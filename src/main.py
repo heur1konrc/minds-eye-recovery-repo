@@ -978,6 +978,7 @@ def about_page():
 </body>
 </html>
         '''
+    return html_content
         
     except Exception as e:
         print(f"Error in about page: {e}")
