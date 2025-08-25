@@ -39,6 +39,41 @@ def delete_user(user_id):
     return '', 204
 
 
+@user_bp.route('/portfolio-debug', methods=['GET'])
+def get_portfolio_debug():
+    """Debug endpoint to test database access in user blueprint"""
+    try:
+        # Test basic image count
+        image_count = Image.query.count()
+        category_count = Category.query.count()
+        
+        # Get first image if exists
+        first_image = Image.query.first()
+        first_image_data = None
+        if first_image:
+            first_image_data = {
+                'id': str(first_image.id),
+                'title': first_image.title,
+                'filename': first_image.filename
+            }
+        
+        debug_data = {
+            'image_count': image_count,
+            'category_count': category_count,
+            'first_image': first_image_data,
+            'blueprint': 'user_bp',
+            'status': 'success'
+        }
+        
+        return jsonify(debug_data)
+        
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'blueprint': 'user_bp',
+            'status': 'error'
+        }), 500
+
 @user_bp.route('/portfolio', methods=['GET'])
 def get_portfolio():
     """API endpoint to get portfolio data from SQL database"""
