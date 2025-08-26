@@ -140,12 +140,13 @@ with app.app_context():
         print(f"⚠️  EXIF column migration error: {e}")
     
     print("✅ EXIF columns migration complete")
-            # Try creating the table with the new schema
-            try:
-                db.create_all()
-                print("✅ Created tables with new schema")
-            except Exception as create_error:
-                print(f"❌ Failed to create tables: {create_error}")
+    
+    # Try creating the table with the new schema
+    try:
+        db.create_all()
+        print("✅ Created tables with new schema")
+    except Exception as create_error:
+        print(f"❌ Failed to create tables: {create_error}")
     
     # Only migrate images if no images exist in database
     try:
