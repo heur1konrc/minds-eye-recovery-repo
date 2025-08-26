@@ -386,7 +386,27 @@ def get_featured_image():
         featured_image = Image.query.filter(Image.is_featured == True).first()
         
         if featured_image:
-            # Return complete featured image data
+            # Return complete featured image data including EXIF
+            exif_data = {}
+            if featured_image.camera_make or featured_image.camera_model:
+                exif_data['camera'] = f"{featured_image.camera_make or ''} {featured_image.camera_model or ''}".strip()
+            if featured_image.lens_model:
+                exif_data['lens'] = featured_image.lens_model
+            if featured_image.focal_length:
+                exif_data['focal_length'] = featured_image.focal_length
+            if featured_image.aperture:
+                exif_data['aperture'] = featured_image.aperture
+            if featured_image.shutter_speed:
+                exif_data['shutter_speed'] = featured_image.shutter_speed
+            if featured_image.iso:
+                exif_data['iso'] = featured_image.iso
+            if featured_image.flash:
+                exif_data['flash'] = featured_image.flash
+            if featured_image.exposure_mode:
+                exif_data['exposure_mode'] = featured_image.exposure_mode
+            if featured_image.white_balance:
+                exif_data['white_balance'] = featured_image.white_balance
+            
             return jsonify({
                 'image': featured_image.filename,
                 'title': featured_image.title,
@@ -396,7 +416,8 @@ def get_featured_image():
                 'upload_date': featured_image.upload_date.isoformat() if featured_image.upload_date else None,
                 'file_size': featured_image.file_size,
                 'width': featured_image.width,
-                'height': featured_image.height
+                'height': featured_image.height,
+                'exif_data': exif_data
             })
         else:
             # No featured image set

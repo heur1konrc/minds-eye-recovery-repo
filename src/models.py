@@ -33,6 +33,18 @@ class Image(db.Model):
     featured_story = db.Column(db.Text)
     display_order = db.Column(db.Integer, default=0)
     
+    # EXIF Data fields
+    camera_make = db.Column(db.String(100))
+    camera_model = db.Column(db.String(100))
+    lens_model = db.Column(db.String(100))
+    focal_length = db.Column(db.String(50))
+    aperture = db.Column(db.String(50))
+    shutter_speed = db.Column(db.String(50))
+    iso = db.Column(db.String(50))
+    flash = db.Column(db.String(50))
+    exposure_mode = db.Column(db.String(50))
+    white_balance = db.Column(db.String(50))
+    
     # Relationships
     categories = db.relationship('ImageCategory', back_populates='image', cascade='all, delete-orphan')
     
