@@ -378,26 +378,35 @@ def get_categories():
 
 @app.route('/api/featured-image')
 def get_featured_image():
-    """API endpoint to get featured image"""
+    """API endpoint to get featured image with complete data"""
     try:
         from src.models import SystemConfig, Image
         
-        # Get featured image from system config
-        featured_config = SystemConfig.query.filter_by(key='featured_image').first()
-        if featured_config:
-            return jsonify({'image': featured_config.value})
+        # Get featured image from database using is_featured flag
+        featured_image = Image.query.filter(Image.is_featured == True).first()
+        
+        if featured_image:
+            # Return complete featured image data
+            return jsonify({
+                'image': featured_image.filename,
+                'title': featured_image.title,
+                'description': featured_image.description,
+                'story': featured_image.featured_story,
+                'filename': featured_image.filename,
+                'upload_date': featured_image.upload_date.isoformat() if featured_image.upload_date else None,
+                'file_size': featured_image.file_size,
+                'width': featured_image.width,
+                'height': featured_image.height
+            })
         else:
-            # Return first image as default
-            first_image = Image.query.first()
-            if first_image:
-                return jsonify({'image': first_image.filename})
-            else:
-                return jsonify({'image': None})
+            # No featured image set
+            return jsonify({'error': 'No featured image set'}), 404
         
     except Exception as e:
         print(f"Error loading featured image from database: {e}")
         import traceback
         traceback.print_exc()
+        return jsonify({'error': 'Failed to load featured image'}), 500
         return jsonify({'image': None}), 500
 
 @app.route('/api/test')
