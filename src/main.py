@@ -407,31 +407,70 @@ def get_featured_image():
     """API endpoint to get featured image with complete data"""
     try:
         from src.models import SystemConfig, Image
+        from PIL import Image as PILImage
+        from PIL.ExifTags import TAGS
+        import os
         
         # Get featured image from database using is_featured flag
         featured_image = Image.query.filter(Image.is_featured == True).first()
         
         if featured_image:
-            # Return complete featured image data including EXIF
+            # Extract EXIF data from actual image file
+            image_path = os.path.join(PHOTOGRAPHY_ASSETS_DIR, featured_image.filename)
             exif_data = {}
-            if featured_image.camera_make or featured_image.camera_model:
-                exif_data['camera'] = f"{featured_image.camera_make or ''} {featured_image.camera_model or ''}".strip()
-            if featured_image.lens_model:
-                exif_data['lens'] = featured_image.lens_model
-            if featured_image.focal_length:
-                exif_data['focal_length'] = featured_image.focal_length
-            if featured_image.aperture:
-                exif_data['aperture'] = featured_image.aperture
-            if featured_image.shutter_speed:
-                exif_data['shutter_speed'] = featured_image.shutter_speed
-            if featured_image.iso:
-                exif_data['iso'] = featured_image.iso
-            if featured_image.flash:
-                exif_data['flash'] = featured_image.flash
-            if featured_image.exposure_mode:
-                exif_data['exposure_mode'] = featured_image.exposure_mode
-            if featured_image.white_balance:
-                exif_data['white_balance'] = featured_image.white_balance
+            
+            if os.path.exists(image_path):
+                try:
+                    with PILImage.open(image_path) as pil_image:
+                        exif = pil_image._getexif()
+                        if exif is not None:
+                            for tag_id, value in exif.items():
+                                tag = TAGS.get(tag_id, tag_id)
+                                
+                                # Convert bytes to string if needed
+                                if isinstance(value, bytes):
+                                    try:
+                                        value = value.decode('utf-8')
+                                    except:
+                                        value = str(value)
+                                
+                                # Format common EXIF tags
+                                if tag == 'DateTime':
+                                    exif_data['capture_date'] = str(value)
+                                elif tag == 'Make':
+                                    exif_data['camera_make'] = str(value)
+                                elif tag == 'Model':
+                                    exif_data['camera_model'] = str(value)
+                                elif tag == 'LensModel':
+                                    exif_data['lens_model'] = str(value)
+                                elif tag == 'FocalLength':
+                                    if isinstance(value, tuple) and len(value) == 2:
+                                        focal_length = value[0] / value[1] if value[1] != 0 else value[0]
+                                        exif_data['focal_length'] = f"{focal_length:.1f}mm"
+                                    else:
+                                        exif_data['focal_length'] = f"{value}mm"
+                                elif tag == 'FNumber':
+                                    if isinstance(value, tuple) and len(value) == 2:
+                                        f_number = value[0] / value[1] if value[1] != 0 else value[0]
+                                        exif_data['aperture'] = f"f/{f_number:.1f}"
+                                    else:
+                                        exif_data['aperture'] = f"f/{value}"
+                                elif tag == 'ExposureTime':
+                                    if isinstance(value, tuple) and len(value) == 2:
+                                        if value[0] < value[1]:
+                                            exif_data['shutter_speed'] = f"1/{int(value[1]/value[0])}"
+                                        else:
+                                            exif_data['shutter_speed'] = f"{value[0]/value[1]:.2f}s"
+                                    else:
+                                        exif_data['shutter_speed'] = str(value)
+                                elif tag == 'ISOSpeedRatings':
+                                    exif_data['iso'] = f"ISO {value}"
+                                elif tag == 'Flash':
+                                    flash_fired = value & 1
+                                    exif_data['flash'] = "Yes" if flash_fired else "No"
+                                    
+                except Exception as e:
+                    print(f"Error extracting EXIF from {image_path}: {e}")
             
             return jsonify({
                 'image': featured_image.filename,
@@ -454,7 +493,6 @@ def get_featured_image():
         import traceback
         traceback.print_exc()
         return jsonify({'error': 'Failed to load featured image'}), 500
-        return jsonify({'image': None}), 500
 
 @app.route('/api/all-images')
 def get_all_images():

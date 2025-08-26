@@ -1,8 +1,8 @@
 import os
 import json
 from flask import Blueprint, request, render_template_string, redirect, url_for, session, jsonify
-# from PIL import Image
-# from PIL.ExifTags import TAGS
+from PIL import Image as PILImage
+from PIL.ExifTags import TAGS
 from datetime import datetime
 from ..config import PHOTOGRAPHY_ASSETS_DIR, PORTFOLIO_DATA_FILE
 
@@ -91,9 +91,64 @@ def save_featured_data(image_id, story):
         return False
 
 def extract_exif_data(image_path):
-    """Extract EXIF data from image - TEMPORARILY DISABLED"""
-    # Temporarily disabled due to PIL deployment issues
-    return {}
+    """Extract EXIF data from image"""
+    try:
+        with PILImage.open(image_path) as image:
+            exif_data = {}
+            
+            # Get basic EXIF data
+            exif = image._getexif()
+            if exif is not None:
+                for tag_id, value in exif.items():
+                    tag = TAGS.get(tag_id, tag_id)
+                    
+                    # Convert bytes to string if needed
+                    if isinstance(value, bytes):
+                        try:
+                            value = value.decode('utf-8')
+                        except:
+                            value = str(value)
+                    
+                    # Format common EXIF tags
+                    if tag == 'DateTime':
+                        exif_data['capture_date'] = str(value)
+                    elif tag == 'Make':
+                        exif_data['camera_make'] = str(value)
+                    elif tag == 'Model':
+                        exif_data['camera_model'] = str(value)
+                    elif tag == 'LensModel':
+                        exif_data['lens_model'] = str(value)
+                    elif tag == 'FocalLength':
+                        if isinstance(value, tuple) and len(value) == 2:
+                            focal_length = value[0] / value[1] if value[1] != 0 else value[0]
+                            exif_data['focal_length'] = f"{focal_length:.1f}mm"
+                        else:
+                            exif_data['focal_length'] = f"{value}mm"
+                    elif tag == 'FNumber':
+                        if isinstance(value, tuple) and len(value) == 2:
+                            f_number = value[0] / value[1] if value[1] != 0 else value[0]
+                            exif_data['aperture'] = f"f/{f_number:.1f}"
+                        else:
+                            exif_data['aperture'] = f"f/{value}"
+                    elif tag == 'ExposureTime':
+                        if isinstance(value, tuple) and len(value) == 2:
+                            if value[0] < value[1]:
+                                exif_data['shutter_speed'] = f"1/{int(value[1]/value[0])}"
+                            else:
+                                exif_data['shutter_speed'] = f"{value[0]/value[1]:.2f}s"
+                        else:
+                            exif_data['shutter_speed'] = str(value)
+                    elif tag == 'ISOSpeedRatings':
+                        exif_data['iso'] = f"ISO {value}"
+                    elif tag == 'Flash':
+                        flash_fired = value & 1
+                        exif_data['flash'] = "Yes" if flash_fired else "No"
+            
+            return exif_data
+            
+    except Exception as e:
+        print(f"Error extracting EXIF data from {image_path}: {e}")
+        return {}
 
 @featured_bp.route('/api/featured')
 def get_featured_image():
