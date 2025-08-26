@@ -229,10 +229,10 @@ def serve_photography_assets(filename):
 def get_slideshow():
     """Get slideshow images from admin system"""
     try:
-        print("🎬 Slideshow API called")
+        from src.models import Image
         
-        # Get images marked for slideshow from admin
-        slideshow_images = Image.query.filter(Image.slideshow == True).all()
+        # Get images marked for slideshow from admin - FIXED COLUMN NAME
+        slideshow_images = Image.query.filter(Image.is_slideshow_background == True).all()
         print(f"📊 Found {len(slideshow_images)} slideshow images")
         
         slideshow_data = []
@@ -240,10 +240,10 @@ def get_slideshow():
         for image in slideshow_images:
             print(f"🎬 Processing slideshow image: {image.filename}")
             slideshow_item = {
-                'id': str(image.id),
+                'id': image.id,
                 'filename': image.filename,
-                'title': image.title or f"Slideshow Image {image.id}",
-                'url': f"/static/assets/{image.filename}"
+                'title': image.title,
+                'description': image.description
             }
             slideshow_data.append(slideshow_item)
         
@@ -262,14 +262,14 @@ def get_slideshow_images():
     try:
         slideshow_data = []
         
-        slideshow_images = Image.query.filter(Image.slideshow == True).all()
+        slideshow_images = Image.query.filter(Image.is_slideshow_background == True).all()
         
         for image in slideshow_images:
             slideshow_item = {
-                'id': str(image.id),
+                'id': image.id,
                 'filename': image.filename,
-                'title': image.title or f"Slideshow Image {image.id}",
-                'url': f"/static/assets/{image.filename}"
+                'title': image.title,
+                'description': image.description
             }
             slideshow_data.append(slideshow_item)
         
