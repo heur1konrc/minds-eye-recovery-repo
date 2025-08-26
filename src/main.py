@@ -462,7 +462,13 @@ def get_featured_image():
                                         else:
                                             exif_data['shutter_speed'] = f"{value[0]/value[1]:.2f}s"
                                     else:
-                                        exif_data['shutter_speed'] = str(value)
+                                        # Handle decimal values like 0.001333333
+                                        if isinstance(value, (int, float)) and value < 1:
+                                            # Convert decimal to fraction (e.g., 0.00133 -> 1/750)
+                                            fraction_denominator = int(1 / value)
+                                            exif_data['shutter_speed'] = f"1/{fraction_denominator}"
+                                        else:
+                                            exif_data['shutter_speed'] = f"{value}s"
                                 elif tag == 'ISOSpeedRatings':
                                     exif_data['iso'] = f"ISO {value}"
                                 elif tag == 'Flash':
