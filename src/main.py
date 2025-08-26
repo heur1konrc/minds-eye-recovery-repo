@@ -115,6 +115,31 @@ with app.app_context():
             print("✅ Added is_about column to existing database")
         except Exception as alter_error:
             print(f"❌ Failed to add is_about column: {alter_error}")
+    
+    # Add EXIF columns if they don't exist
+    try:
+        with db.engine.connect() as conn:
+            # Check if EXIF columns exist, if not add them
+            exif_columns = [
+                'camera_make', 'camera_model', 'lens_model', 'focal_length',
+                'aperture', 'shutter_speed', 'iso', 'flash', 'exposure_mode', 'white_balance'
+            ]
+            
+            for column in exif_columns:
+                try:
+                    conn.execute(db.text(f"ALTER TABLE images ADD COLUMN {column} VARCHAR(100)"))
+                    print(f"✅ Added {column} column")
+                except Exception as e:
+                    if "duplicate column name" in str(e).lower() or "already exists" in str(e).lower():
+                        print(f"ℹ️  {column} column already exists")
+                    else:
+                        print(f"⚠️  Error adding {column} column: {e}")
+            
+            conn.commit()
+    except Exception as e:
+        print(f"⚠️  EXIF column migration error: {e}")
+    
+    print("✅ EXIF columns migration complete")
             # Try creating the table with the new schema
             try:
                 db.create_all()
