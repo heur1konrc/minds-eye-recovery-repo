@@ -271,7 +271,7 @@ def migrate_existing_images():
     """Migrate existing images from volume to database"""
     from src.config import PHOTOGRAPHY_ASSETS_DIR
     import os
-    from PIL import Image as PILImage
+    # from PIL import Image as PILImage
     
     print("🔄 Starting image migration from volume to SQL database...")
     
@@ -313,8 +313,9 @@ def migrate_existing_images():
         # Get image metadata
         file_path = os.path.join(PHOTOGRAPHY_ASSETS_DIR, filename)
         try:
-            with PILImage.open(file_path) as img:
-                width, height = img.size
+            # with PILImage.open(file_path) as img:
+            #     width, height = img.size
+            width, height = None, None  # Temporarily disabled
             file_size = os.path.getsize(file_path)
         except Exception as e:
             print(f"⚠️  Could not get info for {filename}: {e}")

@@ -5,7 +5,7 @@ About Content and Images Management Routes
 import os
 from flask import Blueprint, request, redirect, url_for, render_template_string, session, jsonify
 from werkzeug.utils import secure_filename
-from PIL import Image as PILImage
+# from PIL import Image as PILImage
 from ..models import db, AboutContent, AboutImage
 from ..config import PHOTOGRAPHY_ASSETS_DIR
 

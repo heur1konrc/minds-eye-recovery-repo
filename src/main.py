@@ -1209,8 +1209,14 @@ def database_inspect():
             "images_table": [],
             "about_images_table": [],
             "image_count": 0,
-            "about_image_count": 0
+            "about_image_count": 0,
+            "categories_count": 0
         }
+        
+        # Check categories
+        categories = Category.query.all()
+        result["categories_count"] = len(categories)
+        result["categories"] = [cat.name for cat in categories]
         
         # Check main images table
         images = Image.query.all()
@@ -1241,4 +1247,116 @@ def database_inspect():
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/api/init-database")
+def init_database():
+    """Manually initialize database with default categories"""
+    try:
+        # Force initialize categories
+        init_default_categories()
+        
+        # Force initialize system config
+        init_system_config()
+        
+        return jsonify({
+            "success": True,
+            "message": "Database initialized successfully",
+            "categories_count": Category.query.count()
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/test-upload-path")
+def test_upload_path():
+    """Test if upload path is accessible"""
+    try:
+        import os
+        from src.config import PHOTOGRAPHY_ASSETS_DIR
+        
+        result = {
+            "photography_assets_dir": PHOTOGRAPHY_ASSETS_DIR,
+            "path_exists": os.path.exists(PHOTOGRAPHY_ASSETS_DIR),
+            "is_writable": False,
+            "can_create_dir": False
+        }
+        
+        # Test if we can create the directory
+        try:
+            os.makedirs(PHOTOGRAPHY_ASSETS_DIR, exist_ok=True)
+            result["can_create_dir"] = True
+        except Exception as e:
+            result["create_dir_error"] = str(e)
+        
+        # Test if we can write to it
+        try:
+            test_file = os.path.join(PHOTOGRAPHY_ASSETS_DIR, "test.txt")
+            with open(test_file, "w") as f:
+                f.write("test")
+            os.remove(test_file)
+            result["is_writable"] = True
+        except Exception as e:
+            result["write_error"] = str(e)
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/test-minimal-upload", methods=['POST'])
+def test_minimal_upload():
+    """Minimal upload test to isolate the issue"""
+    try:
+        import os
+        import uuid
+        from werkzeug.utils import secure_filename
+        from src.config import PHOTOGRAPHY_ASSETS_DIR
+        from src.models import db, Image, Category
+        from datetime import datetime
+        
+        # Get a test file
+        image_files = request.files.getlist('image')
+        if not image_files or not image_files[0].filename:
+            return jsonify({"error": "No file provided"}), 400
+        
+        image_file = image_files[0]
+        
+        # Generate filename
+        unique_id = str(uuid.uuid4())[:8]
+        filename = f"test-{unique_id}.jpg"
+        
+        # Save file
+        os.makedirs(PHOTOGRAPHY_ASSETS_DIR, exist_ok=True)
+        final_path = os.path.join(PHOTOGRAPHY_ASSETS_DIR, filename)
+        image_file.save(final_path)
+        
+        # Get file size
+        file_size = os.path.getsize(final_path)
+        
+        # Create database entry
+        new_image = Image(
+            filename=filename,
+            title="Test Image",
+            description="Test upload",
+            file_size=file_size,
+            width=None,
+            height=None,
+            upload_date=datetime.now()
+        )
+        
+        db.session.add(new_image)
+        db.session.commit()
+        
+        return jsonify({
+            "success": True,
+            "filename": filename,
+            "file_size": file_size,
+            "image_id": new_image.id
+        })
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        return jsonify({
+            "error": str(e),
+            "traceback": error_details
+        }), 500
 

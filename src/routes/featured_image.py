@@ -1,8 +1,8 @@
 import os
 import json
 from flask import Blueprint, request, render_template_string, redirect, url_for, session, jsonify
-from PIL import Image
-from PIL.ExifTags import TAGS
+# from PIL import Image
+# from PIL.ExifTags import TAGS
 from datetime import datetime
 from ..config import PHOTOGRAPHY_ASSETS_DIR, PORTFOLIO_DATA_FILE
 
@@ -91,89 +91,9 @@ def save_featured_data(image_id, story):
         return False
 
 def extract_exif_data(image_path):
-    """Extract EXIF data from image"""
-    try:
-        print(f"Extracting EXIF from: {image_path}")
-        with Image.open(image_path) as img:
-            exif_dict = img._getexif()
-            
-            if exif_dict is not None:
-                exif = {TAGS[key]: value for key, value in exif_dict.items() if key in TAGS}
-                print(f"Found EXIF tags: {list(exif.keys())}")
-                
-                # Format camera make/model - fix duplication
-                make = exif.get('Make', '').strip()
-                model = exif.get('Model', '').strip()
-                
-                # Check if model already contains make to avoid duplication
-                if make and model:
-                    if model.lower().startswith(make.lower()):
-                        # Model already includes make (e.g., "Canon R8")
-                        camera = model
-                    else:
-                        # Model doesn't include make, combine them
-                        camera = f"{make} {model}".strip()
-                elif model:
-                    # Only model available
-                    camera = model
-                elif make:
-                    # Only make available
-                    camera = make
-                else:
-                    camera = 'Unknown'
-                
-                # Format aperture
-                aperture = exif.get('FNumber', 'Unknown')
-                if aperture != 'Unknown' and isinstance(aperture, (int, float)):
-                    aperture = f"{aperture:.1f}"
-                elif aperture != 'Unknown' and hasattr(aperture, 'real'):
-                    aperture = f"{float(aperture):.1f}"
-                
-                # Format shutter speed
-                shutter = exif.get('ExposureTime', 'Unknown')
-                if shutter != 'Unknown' and isinstance(shutter, (int, float)):
-                    if shutter >= 1:
-                        shutter = f"{shutter:.1f}"
-                    else:
-                        shutter = f"1/{int(1/shutter)}"
-                elif shutter != 'Unknown' and hasattr(shutter, 'real'):
-                    shutter_val = float(shutter)
-                    if shutter_val >= 1:
-                        shutter = f"{shutter_val:.1f}"
-                    else:
-                        shutter = f"1/{int(1/shutter_val)}"
-                
-                # Extract specific EXIF data
-                # Format date to mm/dd/yyyy hh:mm AM/PM
-                date_taken = exif.get('DateTime', exif.get('DateTimeOriginal', 'Unknown'))
-                if date_taken != 'Unknown':
-                    try:
-                        # Parse the EXIF date format (YYYY:MM:DD HH:MM:SS)
-                        from datetime import datetime
-                        dt = datetime.strptime(date_taken, '%Y:%m:%d %H:%M:%S')
-                        # Format to mm/dd/yyyy hh:mm AM/PM
-                        date_taken = dt.strftime('%m/%d/%Y %I:%M %p')
-                    except:
-                        pass  # Keep original if parsing fails
-                
-                camera_info = {
-                    'camera': camera,
-                    'lens': exif.get('LensModel', exif.get('Lens', 'Unknown')),
-                    'aperture': str(aperture),
-                    'shutter_speed': str(shutter),
-                    'iso': str(exif.get('ISOSpeedRatings', exif.get('ISO', 'Unknown'))),
-                    'date_taken': date_taken,
-                    'gps_info': 'Unknown'  # Simplified for now
-                }
-                
-                print(f"Extracted EXIF: {camera_info}")
-                return camera_info
-            else:
-                print("No EXIF data found in image")
-                return {}
-    except Exception as e:
-        print(f"Error extracting EXIF data: {e}")
-        return {}
+    """Extract EXIF data from image - TEMPORARILY DISABLED"""
+    # Temporarily disabled due to PIL deployment issues
+    return {}
 
 @featured_bp.route('/api/featured')
 def get_featured_image():

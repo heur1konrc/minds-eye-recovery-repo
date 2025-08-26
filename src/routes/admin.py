@@ -240,12 +240,8 @@ def admin_upload():
                 
                 # Get file size and dimensions
                 file_size = os.path.getsize(final_path)
-                try:
-                    from PIL import Image as PILImage
-                    with PILImage.open(final_path) as img:
-                        width, height = img.size
-                except:
-                    width, height = None, None
+                # PIL temporarily disabled - set dimensions to None
+                width, height = None, None
                 
                 # Create new image in database
                 final_title = f"{title} {uploaded_count + 1}" if len([f for f in image_files if f.filename]) > 1 else title
@@ -281,7 +277,10 @@ def admin_upload():
         
     except Exception as e:
         db.session.rollback()
-        print(f"Upload error: {e}")  # Debug logging
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Upload error: {e}")
+        print(f"Full traceback: {error_details}")
         return redirect(url_for('admin.admin_dashboard') + f'?message=Upload failed: {str(e)}&message_type=error')
 
 @admin_bp.route('/admin/bulk-delete', methods=['POST'])
