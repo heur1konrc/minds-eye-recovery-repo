@@ -456,6 +456,60 @@ def get_featured_image():
         return jsonify({'error': 'Failed to load featured image'}), 500
         return jsonify({'image': None}), 500
 
+@app.route('/api/all-images')
+def get_all_images():
+    """API endpoint to list all images in /data directory and database"""
+    try:
+        from src.models import Image
+        import os
+        
+        # Get all images from database
+        db_images = Image.query.all()
+        
+        # Get all image files from /data directory
+        data_dir = '/data'
+        file_images = []
+        if os.path.exists(data_dir):
+            for filename in os.listdir(data_dir):
+                if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                    file_path = os.path.join(data_dir, filename)
+                    file_size = os.path.getsize(file_path) if os.path.exists(file_path) else 0
+                    file_images.append({
+                        'filename': filename,
+                        'file_size': file_size,
+                        'in_database': any(img.filename == filename for img in db_images)
+                    })
+        
+        # Format database images
+        db_image_list = []
+        for img in db_images:
+            db_image_list.append({
+                'id': img.id,
+                'filename': img.filename,
+                'title': img.title,
+                'is_featured': img.is_featured,
+                'is_about': img.is_about,
+                'file_size': img.file_size,
+                'width': img.width,
+                'height': img.height,
+                'upload_date': img.upload_date.isoformat() if img.upload_date else None
+            })
+        
+        return jsonify({
+            'status': 'success',
+            'data_directory': data_dir,
+            'total_files_in_data': len(file_images),
+            'total_images_in_database': len(db_images),
+            'files_in_data': file_images,
+            'images_in_database': db_image_list
+        })
+        
+    except Exception as e:
+        print(f"Error listing images: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/test')
 def api_test():
     """Simple test API endpoint without database queries"""
