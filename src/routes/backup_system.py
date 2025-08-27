@@ -195,19 +195,67 @@ def create_manual_backup():
                     if os.path.isfile(file_path) and not file.endswith('.db'):
                         shutil.copy2(file_path, images_backup_path)
             
-            # 3. Backup source code
+            # 3. Backup source code - COMPLETE PROJECT BACKUP
             code_backup_path = os.path.join(backup_dir, 'source_code')
             os.makedirs(code_backup_path)
             
-            # Copy main source files
-            src_dir = os.path.dirname(os.path.dirname(__file__))
-            for item in ['src', 'requirements.txt', 'README.md']:
-                src_path = os.path.join(src_dir, item)
+            # Get project root directory (go up from src/routes/ to project root)
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+            
+            # Copy ALL essential project files and directories
+            essential_items = [
+                'src',           # Backend source code
+                'frontend',      # Frontend React app
+                'requirements.txt',  # Python dependencies
+                'package.json',      # Node.js dependencies (if exists)
+                'wsgi.py',          # WSGI entry point
+                'main.py',          # Main application file (if exists)
+                'README.md',        # Documentation
+                '.gitignore',       # Git ignore file
+                'Procfile',         # Railway deployment file (if exists)
+                'railway.json',     # Railway config (if exists)
+                'Dockerfile',       # Docker config (if exists)
+            ]
+            
+            # Copy each essential item
+            for item in essential_items:
+                src_path = os.path.join(project_root, item)
+                dest_path = os.path.join(code_backup_path, item)
+                
                 if os.path.exists(src_path):
-                    if os.path.isdir(src_path):
-                        shutil.copytree(src_path, os.path.join(code_backup_path, item))
-                    else:
-                        shutil.copy2(src_path, code_backup_path)
+                    try:
+                        if os.path.isdir(src_path):
+                            # Skip node_modules and other large directories
+                            if item == 'frontend':
+                                # Copy frontend but exclude node_modules
+                                shutil.copytree(src_path, dest_path, 
+                                              ignore=shutil.ignore_patterns('node_modules', 'dist', '.next', 'build'))
+                            else:
+                                shutil.copytree(src_path, dest_path)
+                        else:
+                            shutil.copy2(src_path, dest_path)
+                    except Exception as e:
+                        print(f"Warning: Could not backup {item}: {str(e)}")
+            
+            # Create a backup manifest
+            manifest = {
+                'backup_type': 'COMPLETE_PROJECT_BACKUP',
+                'timestamp': datetime.now().isoformat(),
+                'project_root': project_root,
+                'backed_up_items': [],
+                'skipped_items': []
+            }
+            
+            # Check what was actually backed up
+            for item in essential_items:
+                if os.path.exists(os.path.join(code_backup_path, item)):
+                    manifest['backed_up_items'].append(item)
+                else:
+                    manifest['skipped_items'].append(item)
+            
+            # Save manifest
+            with open(os.path.join(code_backup_path, 'BACKUP_MANIFEST.json'), 'w') as f:
+                json.dump(manifest, f, indent=2)
             
             # 4. Create restore instructions
             restore_instructions = create_restore_instructions()
