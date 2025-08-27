@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 const BioPage = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
     fetch('/api/about-images')
@@ -10,15 +11,18 @@ const BioPage = () => {
       .then(data => {
         console.log('About images loaded:', data);
         setImages(data || []);
+        setDataLoaded(true);
         setLoading(false);
       })
       .catch(error => {
         console.error('Error loading images:', error);
+        setDataLoaded(true); // Mark as loaded even on error
         setLoading(false);
       });
   }, []);
 
-  if (loading) {
+  // Show loading until we have confirmed data load (success or failure)
+  if (loading || !dataLoaded) {
     return <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white">Loading...</div>;
   }
 
