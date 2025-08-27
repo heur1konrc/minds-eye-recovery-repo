@@ -108,7 +108,7 @@ const FeaturedPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 pb-12">
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8 border border-red-500">
           {/* Featured Image - Using About page pattern */}
           <div className="lg:col-span-2">
             <div className="relative">
