@@ -348,31 +348,26 @@ def get_about_content():
 
 @app.route('/api/about-images')
 def get_about_images():
-    """Get about page images from About Page Images category"""
+    """Get about page images from AboutImage model"""
     try:
-        # Look for images in the "About Page Images" category
-        about_category = Category.query.filter_by(name='About Page Images').first()
+        # Import AboutImage model
+        from src.models.about import AboutImage
         
-        if not about_category:
-            print("🚨 About Page Images category not found")
-            return jsonify([])
-        
-        # Get all images in the About Page Images category
-        images = Image.query.join(ImageCategory).filter(
-            ImageCategory.category_id == about_category.id
-        ).all()
+        # Get all about images ordered by display_order
+        about_images = AboutImage.query.order_by(AboutImage.display_order).all()
         
         result = []
-        for image in images:
+        for image in about_images:
             result.append({
                 'id': image.id,
                 'title': image.title,
                 'filename': image.filename,
                 'description': image.description or '',
-                'categories': [cat.name for cat in image.categories]
+                'display_order': image.display_order,
+                'image_url': image.image_url
             })
         
-        print(f"🔍 Found {len(result)} about images in 'About Page Images' category")
+        print(f"🔍 Found {len(result)} about images in AboutImage table")
         return jsonify(result)
     except Exception as e:
         print(f"Error fetching about images: {e}")
