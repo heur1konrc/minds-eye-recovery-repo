@@ -105,10 +105,23 @@ def backup_system_dashboard():
 
 @backup_system_bp.route('/admin/backup/create-manual', methods=['POST'])
 def create_manual_backup():
-    """Create complete manual backup (images + data + database)"""
+    """Create complete manual backup (images + data + database) with custom filename"""
     try:
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        backup_name = f"mindseye_backup_{timestamp}"
+        # Get custom backup name from form
+        custom_name = request.form.get('backup_name', '').strip()
+        if not custom_name:
+            return redirect(url_for('backup_system.backup_system_dashboard') + '?message=Backup name is required&message_type=error')
+        
+        # Sanitize filename
+        import re
+        custom_name = re.sub(r'[^\w\-_\.]', '_', custom_name)
+        if not custom_name.endswith('.tar.gz'):
+            if custom_name.endswith('.tar') or custom_name.endswith('.gz'):
+                custom_name = custom_name.rsplit('.', 1)[0] + '.tar.gz'
+            else:
+                custom_name = custom_name + '.tar.gz'
+        
+        backup_name = custom_name.replace('.tar.gz', '')
         
         # Create temporary directory for backup
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -121,7 +134,8 @@ def create_manual_backup():
             
             # Export all data to JSON
             backup_data = {
-                'timestamp': timestamp,
+                'timestamp': datetime.now().isoformat(),
+                'backup_name': custom_name,
                 'version': '1.0',
                 'images': [],
                 'categories': [],
@@ -202,8 +216,8 @@ def create_manual_backup():
             
             # 5. Create backup info
             backup_info = {
-                'backup_name': backup_name,
-                'timestamp': timestamp,
+                'backup_name': custom_name,
+                'timestamp': datetime.now().isoformat(),
                 'image_count': len(backup_data['images']),
                 'category_count': len(backup_data['categories']),
                 'total_files': len(os.listdir(images_backup_path)) if os.path.exists(images_backup_path) else 0,
@@ -213,15 +227,15 @@ def create_manual_backup():
             with open(os.path.join(backup_dir, 'backup_info.json'), 'w') as f:
                 json.dump(backup_info, f, indent=2)
             
-            # 6. Create TAR.GZ file
-            tar_path = os.path.join(temp_dir, f"{backup_name}.tar.gz")
+            # 6. Create TAR.GZ file with custom name
+            tar_path = os.path.join(temp_dir, custom_name)
             with tarfile.open(tar_path, 'w:gz') as tar:
                 tar.add(backup_dir, arcname=backup_name)
             
-            # Return the TAR.GZ file for download
+            # Return the TAR.GZ file for download with custom name
             return send_file(tar_path, 
                            as_attachment=True, 
-                           download_name=f"{backup_name}.tar.gz",
+                           download_name=custom_name,
                            mimetype='application/gzip')
     
     except Exception as e:
@@ -447,6 +461,16 @@ backup_dashboard_html = '''
             <h2>💾 Manual Backup</h2>
             <p>Create a complete backup including images, database, and source code.</p>
             <form method="POST" action="/admin/backup/create-manual">
+                <div style="margin-bottom: 15px;">
+                    <label for="backup_name" style="display: block; margin-bottom: 5px; color: #4CAF50; font-weight: bold;">Custom Backup Name:</label>
+                    <input type="text" 
+                           id="backup_name" 
+                           name="backup_name" 
+                           placeholder="Enter backup name (e.g., before_website_update)" 
+                           style="width: 100%; max-width: 400px; padding: 8px; border: 1px solid #555; border-radius: 4px; background: #3d3d3d; color: #fff; font-size: 14px;"
+                           required>
+                    <small style="color: #888; display: block; margin-top: 5px;">Will be saved as: your_name.tar.gz</small>
+                </div>
                 <button type="submit" class="backup-btn">📥 Create Complete Backup</button>
             </form>
             <small>Downloads a TAR.GZ file with everything needed for disaster recovery.</small>
