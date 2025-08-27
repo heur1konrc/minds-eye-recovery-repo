@@ -219,6 +219,15 @@ const FeaturedPage = () => {
           </div>
         </div>
 
+        {/* Story section - under the image */}
+        {featuredImage.story && (
+          <div className="max-w-5xl mx-auto mt-8">
+            <div className="bg-slate-800 rounded-lg p-6">
+              <h3 className="text-lg font-bold text-orange-500 mb-3">Story Behind the Shot</h3>
+              <p className="text-slate-300 leading-relaxed">{featuredImage.story}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Fullscreen Modal - CLEAN, no story overlay */}
