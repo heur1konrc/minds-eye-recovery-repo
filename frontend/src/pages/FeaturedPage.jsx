@@ -108,8 +108,8 @@ const FeaturedPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 pb-12">
-        <div className="grid lg:grid-cols-3 gap-8 border border-red-500">
-          {/* Featured Image - Using About page pattern */}
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Featured Image */}
           <div className="lg:col-span-2">
             <div className="relative">
               <div className="rounded-lg overflow-hidden shadow-2xl">
@@ -129,7 +129,7 @@ const FeaturedPage = () => {
             </div>
           </div>
 
-          {/* Image Info */}
+          {/* Image Info Sidebar */}
           <div className="space-y-6">
             <div className="bg-slate-800 rounded-lg p-6">
               <h3 className="text-xl font-bold text-orange-500 mb-4">Image Capture Information</h3>
@@ -219,7 +219,7 @@ const FeaturedPage = () => {
           </div>
         </div>
 
-        {/* Story section - positioned under the entire image layout, same width as image */}
+        {/* Story section - positioned OUTSIDE grid, under the entire layout */}
         {featuredImage.story && (
           <div className="max-w-5xl mx-auto mt-8">
             <div className="bg-slate-800 rounded-lg p-6">
@@ -230,7 +230,7 @@ const FeaturedPage = () => {
         )}
       </div>
 
-      {/* Fullscreen Modal */}
+      {/* Fullscreen Modal - CLEAN, no story overlay */}
       {showFullscreen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4"
