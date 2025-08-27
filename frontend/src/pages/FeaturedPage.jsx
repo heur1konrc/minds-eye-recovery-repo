@@ -83,21 +83,39 @@ const FeaturedPage = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-6 pb-12">
-        {/* A. LARGE FEATURED IMAGE */}
-        <div className="mb-8">
-          <div className="rounded-lg overflow-hidden shadow-2xl">
-            <img
-              src={`/data/${featuredImage.filename}`}
-              alt={featuredImage.title || 'Featured Image'}
-              className="w-full h-auto"
-            />
+        {/* IMAGE AND RIGHT SIDEBAR LAYOUT */}
+        <div className="grid lg:grid-cols-3 gap-8 mb-8">
+          {/* A. LARGE FEATURED IMAGE - LEFT SIDE (2/3 width) */}
+          <div className="lg:col-span-2">
+            <div className="rounded-lg overflow-hidden shadow-2xl">
+              <img
+                src={`/data/${featuredImage.filename}`}
+                alt={featuredImage.title || 'Featured Image'}
+                className="w-full h-auto"
+              />
+            </div>
           </div>
-        </div>
 
-        {/* BUTTONS AND EXIF DATA ROW */}
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
-          {/* BUTTONS */}
-          <div className="space-y-4">
+          {/* RIGHT SIDEBAR - EXIF AND BUTTONS STACKED (1/3 width) */}
+          <div className="space-y-6">
+            {/* B. EXIF DATA - TOP */}
+            <div className="bg-slate-800 rounded-lg p-6">
+              <h3 className="text-xl font-bold text-orange-500 mb-4">Image Capture Information</h3>
+              {featuredImage.exif_data && Object.keys(featuredImage.exif_data).length > 0 ? (
+                <div className="space-y-2 text-slate-300">
+                  {Object.entries(featuredImage.exif_data).map(([key, value]) => (
+                    <div key={key} className="flex justify-between">
+                      <span className="capitalize">{key.replace('_', ' ')}:</span>
+                      <span>{value}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-400 italic">EXIF data not available for this image</p>
+              )}
+            </div>
+
+            {/* BUTTONS - MIDDLE AND BOTTOM */}
             <button 
               onClick={openFullscreen}
               className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
@@ -111,23 +129,6 @@ const FeaturedPage = () => {
             >
               📥 Download Image
             </a>
-          </div>
-
-          {/* B. EXIF DATA */}
-          <div className="bg-slate-800 rounded-lg p-6">
-            <h3 className="text-xl font-bold text-orange-500 mb-4">Image Capture Information</h3>
-            {featuredImage.exif_data && Object.keys(featuredImage.exif_data).length > 0 ? (
-              <div className="space-y-2 text-slate-300">
-                {Object.entries(featuredImage.exif_data).map(([key, value]) => (
-                  <div key={key} className="flex justify-between">
-                    <span className="capitalize">{key.replace('_', ' ')}:</span>
-                    <span>{value}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-slate-400 italic">EXIF data not available for this image</p>
-            )}
           </div>
         </div>
 
