@@ -5,6 +5,40 @@ const FeaturedPage = () => {
   const [loading, setLoading] = useState(true);
   const [showFullscreen, setShowFullscreen] = useState(false);
 
+  // Format capture date to MM/DD/YYYY
+  const formatCaptureDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    
+    // Handle EXIF date format: "2025:08:09 01:57:47" or "2025:08:09"
+    const datePart = dateString.split(' ')[0]; // Remove time part
+    const [year, month, day] = datePart.split(':');
+    
+    if (year && month && day) {
+      return `${month}/${day}/${year}`;
+    }
+    
+    return dateString; // Return original if parsing fails
+  };
+
+  // Social sharing function
+  const shareOnSocial = () => {
+    const url = window.location.href;
+    const text = `Check out this amazing featured image from Mind's Eye Photography!`;
+    
+    // Try native sharing first (mobile)
+    if (navigator.share) {
+      navigator.share({
+        title: 'Mind\'s Eye Photography - Featured Image',
+        text: text,
+        url: url
+      });
+    } else {
+      // Fallback to Twitter sharing
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+      window.open(twitterUrl, '_blank');
+    }
+  };
+
   useEffect(() => {
     fetch('/api/featured-image')
       .then(response => response.json())
@@ -117,7 +151,9 @@ const FeaturedPage = () => {
                     .map(([key, value]) => (
                       <div key={key} className="flex justify-between">
                         <span className="capitalize">{key.replace('_', ' ')}:</span>
-                        <span>{value}</span>
+                        <span>
+                          {key === 'capture_date' ? formatCaptureDate(value) : value}
+                        </span>
                       </div>
                     ))}
                 </div>
@@ -140,6 +176,12 @@ const FeaturedPage = () => {
             >
               📥 Download Image
             </a>
+            <button 
+              onClick={shareOnSocial}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+            >
+              🔗 Share on Social Media
+            </button>
           </div>
         </div>
 
