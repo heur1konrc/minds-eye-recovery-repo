@@ -103,12 +103,23 @@ const FeaturedPage = () => {
               <h3 className="text-xl font-bold text-orange-500 mb-4">Image Capture Information</h3>
               {featuredImage.exif_data && Object.keys(featuredImage.exif_data).length > 0 ? (
                 <div className="space-y-2 text-slate-300">
-                  {Object.entries(featuredImage.exif_data).map(([key, value]) => (
-                    <div key={key} className="flex justify-between">
-                      <span className="capitalize">{key.replace('_', ' ')}:</span>
-                      <span>{value}</span>
+                  {/* Combined Camera Make and Model */}
+                  {featuredImage.exif_data.camera_model && (
+                    <div className="flex justify-between">
+                      <span>Camera Make and Model:</span>
+                      <span>{featuredImage.exif_data.camera_model}</span>
                     </div>
-                  ))}
+                  )}
+                  
+                  {/* Other EXIF data (excluding camera_make and camera_model) */}
+                  {Object.entries(featuredImage.exif_data)
+                    .filter(([key]) => key !== 'camera_make' && key !== 'camera_model')
+                    .map(([key, value]) => (
+                      <div key={key} className="flex justify-between">
+                        <span className="capitalize">{key.replace('_', ' ')}:</span>
+                        <span>{value}</span>
+                      </div>
+                    ))}
                 </div>
               ) : (
                 <p className="text-slate-400 italic">EXIF data not available for this image</p>
