@@ -456,19 +456,30 @@ def get_featured_image():
                                     else:
                                         exif_data['aperture'] = f"f/{value}"
                                 elif tag == 'ExposureTime':
+                                    print(f"DEBUG: ExposureTime value: {value}, type: {type(value)}")
                                     if isinstance(value, tuple) and len(value) == 2:
+                                        print(f"DEBUG: Processing tuple: {value}")
                                         if value[0] < value[1]:
-                                            exif_data['shutter_speed'] = f"1/{int(value[1]/value[0])}"
+                                            result = f"1/{int(value[1]/value[0])}"
+                                            exif_data['shutter_speed'] = result
+                                            print(f"DEBUG: Tuple result: {result}")
                                         else:
-                                            exif_data['shutter_speed'] = f"{value[0]/value[1]:.2f}s"
+                                            result = f"{value[0]/value[1]:.2f}s"
+                                            exif_data['shutter_speed'] = result
+                                            print(f"DEBUG: Tuple decimal result: {result}")
                                     else:
+                                        print(f"DEBUG: Processing non-tuple value: {value}")
                                         # Handle decimal values like 0.001333333
                                         if isinstance(value, (int, float)) and value < 1:
                                             # Convert decimal to fraction (e.g., 0.00133 -> 1/750)
                                             fraction_denominator = int(1 / value)
-                                            exif_data['shutter_speed'] = f"1/{fraction_denominator}"
+                                            result = f"1/{fraction_denominator}"
+                                            exif_data['shutter_speed'] = result
+                                            print(f"DEBUG: Converted {value} to {result}")
                                         else:
-                                            exif_data['shutter_speed'] = f"{value}s"
+                                            result = f"{value}s"
+                                            exif_data['shutter_speed'] = result
+                                            print(f"DEBUG: Used raw value: {result}")
                                 elif tag == 'ISOSpeedRatings':
                                     exif_data['iso'] = f"ISO {value}"
                                 elif tag == 'Flash':
