@@ -22,7 +22,6 @@ from src.routes.debug_migration import debug_migration_bp
 from src.routes.backup_system import backup_system_bp
 from src.routes.og_image import og_bp
 from src.routes.cleanup_api import cleanup_bp
-from src.routes.about_management import about_mgmt_bp
 from src.routes.slideshow_api import slideshow_api_bp  # Simple slideshow API (Option 1)
 from src.routes.enhanced_background import enhanced_bg_bp
 # from src.routes.slideshow_manager import slideshow_bp as slideshow_manager_bp  # Temporarily disabled for deployment fix
@@ -51,7 +50,7 @@ app.register_blueprint(debug_migration_bp)
 app.register_blueprint(backup_system_bp)
 app.register_blueprint(og_bp)
 app.register_blueprint(cleanup_bp)
-app.register_blueprint(about_mgmt_bp)
+
 app.register_blueprint(slideshow_api_bp)  # Simple slideshow API (Option 1)
 app.register_blueprint(enhanced_bg_bp)
 # Import and register the slideshow fix blueprint
@@ -160,12 +159,6 @@ with app.app_context():
         # Don't create fresh database - just continue
     
     print("✅ SQL Database initialization complete")
-
-@app.route('/assets/about/<filename>')
-def serve_about_image(filename):
-    """Serve about images from the about directory"""
-    about_dir = os.path.join(PHOTOGRAPHY_ASSETS_DIR, 'about')
-    return send_from_directory(about_dir, filename)
 
 @app.route('/data/<filename>')
 def serve_data_image(filename):
@@ -326,52 +319,6 @@ def get_simple_portfolio():
         # Return empty array instead of 500 error
         print("🔄 Returning empty array as fallback")
         return jsonify([]), 200
-
-@app.route('/api/about-content')
-def get_about_content():
-    """Get about page content from admin system"""
-    try:
-        # Query the about content from the database
-        # This should connect to your admin's about content management
-        from src.models import AboutContent
-        about = AboutContent.query.first()
-        if about:
-            return jsonify({
-                'content': about.content,
-                'updated_at': about.updated_at.isoformat() if about.updated_at else None
-            })
-        else:
-            return jsonify({'content': ''})
-    except Exception as e:
-        print(f"Error fetching about content: {e}")
-        return jsonify({'content': ''})
-
-@app.route('/api/about-images')
-def get_about_images():
-    """Get about page images from AboutImage model"""
-    try:
-        # Import AboutImage model
-        from src.models.about import AboutImage
-        
-        # Get all about images ordered by display_order
-        about_images = AboutImage.query.order_by(AboutImage.display_order).all()
-        
-        result = []
-        for image in about_images:
-            result.append({
-                'id': image.id,
-                'title': image.title,
-                'filename': image.filename,
-                'description': image.description or '',
-                'display_order': image.display_order,
-                'image_url': image.image_url
-            })
-        
-        print(f"🔍 Found {len(result)} about images in AboutImage table")
-        return jsonify(result)
-    except Exception as e:
-        print(f"Error fetching about images: {e}")
-        return jsonify([])
 
 @app.route('/api/categories')
 def get_categories():
@@ -879,116 +826,6 @@ def get_current_background_api():
         }), 500
 
 
-# Flask About Page with Floating Layout (bypassing React cache issues)
-@app.route('/api/about-floating-page')
-def about_floating():
-    """Serve Flask-based About page with floating image layout"""
-    html_content = '''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Mind's Eye Photography</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .floating-image {
-            float: left;
-            margin-right: 2rem;
-            margin-bottom: 1.5rem;
-            width: 320px;
-        }
-        @media (min-width: 1024px) {
-            .floating-image {
-                width: 384px;
-            }
-        }
-        .clear-float {
-            clear: both;
-        }
-        body {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            color: #e2e8f0;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-    </style>
-</head>
-<body class="min-h-screen">
-    <!-- Navigation -->
-    <nav class="bg-slate-900 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between items-center py-4">
-                <a href="/" class="text-orange-400 text-xl font-bold">Mind's Eye Photography</a>
-                <div class="flex space-x-6">
-                    <a href="/" class="text-slate-300 hover:text-orange-400">Home</a>
-                    <a href="/portfolio" class="text-slate-300 hover:text-orange-400">Portfolio</a>
-                    <a href="/featured" class="text-slate-300 hover:text-orange-400">Featured</a>
-                    <a href="/about" class="text-orange-400">About</a>
-                    <a href="/contact" class="text-slate-300 hover:text-orange-400">Contact</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="min-h-screen bg-gradient-to-br from-slate-800 to-slate-900">
-        <!-- Header -->
-        <div class="text-center py-16">
-            <h1 class="text-4xl lg:text-5xl font-light text-orange-400 mb-4">
-                About Mind's Eye Photography
-            </h1>
-            <p class="text-xl text-slate-300">
-                Where Moments Meet Imagination
-            </p>
-        </div>
-
-        <!-- Content with Floating Image -->
-        <div class="max-w-4xl mx-auto px-6 py-16">
-            <div class="prose prose-lg prose-invert max-w-none">
-                <div class="text-slate-300 leading-relaxed text-lg">
-                    
-                    <!-- Floating Behind the Lens Image -->
-                    <div class="floating-image">
-                        <div class="bg-slate-800 rounded-lg overflow-hidden shadow-2xl" style="aspect-ratio: 3/2;">
-                            <div class="w-full h-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
-                                <p class="text-white text-center font-semibold">Behind the Lens Image<br/>Will appear here once uploaded</p>
-                            </div>
-                        </div>
-                        <p class="text-center text-orange-400 text-sm mt-3 font-light">
-                            Behind the Lens
-                        </p>
-                    </div>
-                    
-                    <!-- Text content that wraps around the floating image -->
-                    <div>
-                        <p class="mb-6">
-                            Born and raised right here in Madison, Wisconsin, I'm a creative spirit with a passion for bringing visions to life. My journey has woven through various rewarding paths – as a <strong>musician/songwriter</strong>, a <strong>Teacher</strong>, a <strong>REALTOR</strong>, and a <strong>Small Business Owner</strong>. Each of these roles has fueled my inspired, creative, and driven approach to everything I do, especially when it comes to photography.
-                        </p>
-                        
-                        <p class="mb-6">
-                            At the heart of Mind's Eye Photography: Where Moments Meet Imagination is my dedication to you. While I cherish the fulfillment of capturing moments that spark my own imagination, my true passion lies in doing the same for my clients. Based in Madison, I frequently travel across the state, always on the lookout for that next inspiring scene.
-                        </p>
-                        
-                        <p class="mb-6">
-                            For me, client satisfaction isn't just a goal – it's the foundation of every interaction. I pour my energy into ensuring you not only love your photos but also enjoy the entire experience. It's truly rewarding to see clients transform into lifelong friends, and that's the kind of connection I strive to build with everyone I work with.
-                        </p>
-                        
-                        <p class="font-semibold text-lg">
-                            Rick Corey
-                        </p>
-                    </div>
-                    
-                    <!-- Clear float -->
-                    <div class="clear-float"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-    '''
-    return html_content
-
 # DIAGNOSTIC TEST ROUTE
 @app.route('/flask-test-12345')
 def flask_diagnostic():
@@ -1008,191 +845,6 @@ def serve_data_file(filename):
         return "File not found", 404
 
 
-@app.route('/about')
-def about_page():
-    """Clean About page using Image table with is_about flag"""
-    try:
-        from src.models import Image
-        about_images = Image.query.filter(Image.is_about == True).order_by(Image.display_order.asc(), Image.upload_date.asc()).all()
-        first_about_image = about_images[0] if about_images else None
-        
-        if first_about_image:
-            image_html = f'<img src="/data/{first_about_image.filename}" alt="{first_about_image.title}" class="w-full h-full object-cover">'
-            image_title = first_about_image.title
-        else:
-            image_html = '<div class="w-full h-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center"><p class="text-white text-center font-semibold">Behind the Lens Image<br/>Will appear here once uploaded</p></div>'
-            image_title = "Behind the Lens"
-        
-        return f'''<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Mind's Eye Photography</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-900 text-white min-h-screen">
-    <nav class="bg-black bg-opacity-50 p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="/" class="text-2xl font-bold text-orange-500">Mind's Eye Photography</a>
-            <div class="space-x-6">
-                <a href="/" class="hover:text-orange-400 transition-colors">Home</a>
-                <a href="/portfolio" class="hover:text-orange-400 transition-colors">Portfolio</a>
-                <a href="/featured" class="hover:text-orange-400 transition-colors">Featured</a>
-                <a href="/about" class="text-orange-500">About</a>
-                <a href="/contact" class="hover:text-orange-400 transition-colors">Contact</a>
-            </div>
-        </div>
-    </nav>
-    <div class="container mx-auto px-4 py-12">
-        <h1 class="text-5xl font-bold text-center mb-4 text-orange-500">About Mind's Eye Photography</h1>
-        <p class="text-xl text-center text-gray-300 mb-12">Where Moments Meet Imagination</p>
-        <div class="max-w-4xl mx-auto">
-            <div class="float-left mr-6 mb-4 w-[500px] h-[333px] rounded-lg overflow-hidden shadow-2xl">
-                {image_html}
-            </div>
-            <p class="text-center font-semibold mb-4 text-orange-400">{image_title}</p>
-            <div class="text-lg leading-relaxed">
-                <p class="mb-6">Born and raised right here in Madison, Wisconsin, I'm a creative spirit with a passion for bringing visions to life. My journey has woven through various rewarding paths – as a <strong>musician/songwriter</strong>, a <strong>Teacher</strong>, a <strong>REALTOR</strong>, and a <strong>Small Business Owner</strong>. Each of these roles has fueled my inspired, creative, and driven approach to everything I do, especially when it comes to photography.</p>
-                <p class="mb-6">At the heart of Mind's Eye Photography: Where Moments Meet Imagination is my dedication to you. While I cherish the fulfillment of capturing moments that spark my own imagination, my true passion lies in doing the same for my clients. Based in Madison, I frequently travel across the state, always on the lookout for that next inspiring scene.</p>
-                <p class="mb-6">For me, client satisfaction isn't just a goal – it's the foundation of every interaction. I pour my energy into ensuring you not only love your photos but also enjoy the entire experience. It's truly rewarding to see clients transform into lifelong friends, and that's the kind of connection I strive to build with everyone I work with.</p>
-                <p class="text-right font-semibold text-xl mt-8 text-orange-400">Rick Corey</p>
-            </div>
-            <div class="clear-both"></div>
-        </div>
-    </div>
-</body>
-</html>'''
-    except Exception as e:
-        return f"Error: {str(e)}", 500
-
-
-
-@app.route('/about-old')
-def about_page_override():
-    """Serve floating layout About page directly from Flask - BYPASSES REACT CACHE"""
-    
-    # Get the first About image from admin system
-    from src.models import AboutImage
-    about_image = AboutImage.query.order_by(AboutImage.display_order.asc(), AboutImage.upload_date.asc()).first()
-    
-    # Generate the image HTML based on whether an image exists
-    if about_image:
-        image_html = f'''
-                        <img src="/data/{about_image.filename}" 
-                             alt="{about_image.title}"
-                             class="w-full h-full object-cover">
-        '''
-        image_title = about_image.title
-    else:
-        image_html = '''
-                        <div class="w-full h-full bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
-                            <p class="text-white text-center font-semibold">Behind the Lens Image<br/>Upload image in admin</p>
-                        </div>
-        '''
-        image_title = "Behind the Lens"
-    
-    html_content = f'''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Mind's Eye Photography</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .floating-image {{
-            float: left;
-            margin-right: 2rem;
-            margin-bottom: 1.5rem;
-            width: 320px;
-        }}
-        @media (min-width: 1024px) {{
-            .floating-image {{
-                width: 384px;
-            }}
-        }}
-        .clear-float {{
-            clear: both;
-        }}
-        body {{
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            color: #e2e8f0;
-            font-family: system-ui, -apple-system, sans-serif;
-        }}
-    </style>
-</head>
-<body class="min-h-screen">
-    <!-- Navigation -->
-    <nav class="bg-slate-900 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between items-center py-4">
-                <a href="/" class="text-orange-400 text-xl font-bold">Mind's Eye Photography</a>
-                <div class="flex space-x-6">
-                    <a href="/" class="text-slate-300 hover:text-orange-400">Home</a>
-                    <a href="/portfolio" class="text-slate-300 hover:text-orange-400">Portfolio</a>
-                    <a href="/featured" class="text-slate-300 hover:text-orange-400">Featured</a>
-                    <a href="/about" class="text-orange-400">About</a>
-                    <a href="/contact" class="text-slate-300 hover:text-orange-400">Contact</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="min-h-screen bg-gradient-to-br from-slate-800 to-slate-900">
-        <!-- Header -->
-        <div class="text-center py-16">
-            <h1 class="text-4xl lg:text-5xl font-light text-orange-400 mb-4">
-                About Mind's Eye Photography
-            </h1>
-            <p class="text-xl text-slate-300">
-                Where Moments Meet Imagination
-            </p>
-        </div>
-
-        <!-- FLOATING IMAGE LAYOUT - EXACTLY LIKE REFERENCE -->
-        <div class="max-w-4xl mx-auto px-6 py-16">
-            <div class="text-slate-300 leading-relaxed text-lg">
-                
-                <!-- Floating Behind the Lens Image -->
-                <div class="floating-image">
-                    <div class="bg-slate-800 rounded-lg overflow-hidden shadow-2xl" style="aspect-ratio: 3/2;">
-                        {image_html}
-                    </div>
-                    <p class="text-center text-orange-400 text-sm mt-3 font-light">
-                        {image_title}
-                    </p>
-                </div>
-                
-                <!-- Text content that wraps around the floating image -->
-                <div>
-                    <p class="mb-6">
-                        Born and raised right here in Madison, Wisconsin, I'm a creative spirit with a passion for bringing visions to life. My journey has woven through various rewarding paths – as a <strong>musician/songwriter</strong>, a <strong>Teacher</strong>, a <strong>REALTOR</strong>, and a <strong>Small Business Owner</strong>. Each of these roles has fueled my inspired, creative, and driven approach to everything I do, especially when it comes to photography.
-                    </p>
-                    
-                    <p class="mb-6">
-                        At the heart of Mind's Eye Photography: Where Moments Meet Imagination is my dedication to you. While I cherish the fulfillment of capturing moments that spark my own imagination, my true passion lies in doing the same for my clients. Based in Madison, I frequently travel across the state, always on the lookout for that next inspiring scene.
-                    </p>
-                    
-                    <p class="mb-6">
-                        For me, client satisfaction isn't just a goal – it's the foundation of every interaction. I pour my energy into ensuring you not only love your photos but also enjoy the entire experience. It's truly rewarding to see clients transform into lifelong friends, and that's the kind of connection I strive to build with everyone I work with.
-                    </p>
-                    
-                    <p class="font-semibold text-lg">
-                        Rick Corey
-                    </p>
-                </div>
-                
-                <!-- Clear float -->
-                <div class="clear-float"></div>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-    '''
-    return html_content
 
 # React Frontend Routes
 @app.route('/assets/<path:filename>')
