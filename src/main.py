@@ -1470,3 +1470,150 @@ def set_about_image_direct(filename):
     except Exception as e:
         return f"Error: {str(e)}"
 
+
+@app.route('/about-minds-eye')
+def about_minds_eye_page():
+    """Serve the about-minds-eye page"""
+    try:
+        # Load about content
+        about_content = load_about_content()
+        about_image = get_about_minds_eye_image()
+        
+        # Create HTML template
+        html_template = '''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Mind's Eye Photography</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #0f172a; 
+            color: #e2e8f0; 
+            margin: 0; 
+            padding: 0; 
+        }
+        .header { 
+            background: #1e293b; 
+            padding: 1rem 2rem; 
+            border-bottom: 2px solid #334155; 
+        }
+        .nav { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .logo { 
+            color: #ff6b35; 
+            font-size: 1.5rem; 
+            font-weight: bold; 
+            text-decoration: none; 
+        }
+        .nav-links { 
+            display: flex; 
+            gap: 2rem; 
+        }
+        .nav-links a { 
+            color: #e2e8f0; 
+            text-decoration: none; 
+            padding: 0.5rem 1rem; 
+            border-radius: 5px; 
+        }
+        .nav-links a:hover { 
+            background: #334155; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 2rem; 
+        }
+        .title { 
+            text-align: center; 
+            color: #ff6b35; 
+            font-size: 3rem; 
+            margin-bottom: 1rem; 
+        }
+        .subtitle { 
+            text-align: center; 
+            color: #94a3b8; 
+            font-size: 1.2rem; 
+            margin-bottom: 3rem; 
+        }
+        .content-section { 
+            background: #1e293b; 
+            border-radius: 10px; 
+            padding: 2rem; 
+            margin-bottom: 2rem; 
+        }
+        .about-image { 
+            float: left; 
+            margin: 0 2rem 1rem 0; 
+            max-width: 400px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
+        }
+        .content-text { 
+            font-size: 1.1rem; 
+            line-height: 1.8; 
+            text-align: justify; 
+        }
+        .signature { 
+            text-align: right; 
+            color: #ff6b35; 
+            font-weight: bold; 
+            font-size: 1.2rem; 
+            margin-top: 2rem; 
+        }
+        .clearfix::after { 
+            content: ""; 
+            display: table; 
+            clear: both; 
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <nav class="nav">
+            <a href="/" class="logo">🎯 Mind's Eye Photography</a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/portfolio">Portfolio</a>
+                <a href="/featured">Featured</a>
+                <a href="/about">About</a>
+                <a href="/contact">Contact</a>
+            </div>
+        </nav>
+    </div>
+    
+    <div class="container">
+        <h1 class="title">About Mind's Eye Photography</h1>
+        <p class="subtitle">Where Moments Meet Imagination</p>
+        
+        <div class="content-section clearfix">
+            {% if about_image %}
+            <img src="/data/{{ about_image }}" alt="About Mind's Eye Photography" class="about-image">
+            {% endif %}
+            
+            <div class="content-text">
+                {{ about_content.main_content|replace('\\n', '<br>')|safe }}
+                
+                <div class="signature">
+                    {{ about_content.signature }}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+        '''
+        
+        from flask import render_template_string
+        return render_template_string(html_template, 
+                                    about_content=about_content, 
+                                    about_image=about_image)
+        
+    except Exception as e:
+        return f"Error loading about page: {str(e)}"
+
