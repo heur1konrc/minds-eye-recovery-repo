@@ -1440,10 +1440,11 @@ def show_data_contents():
                         file_info['json_content'] = 'Error reading JSON'
                 
                 result['files'].append(file_info)
-        print("✅ About page data initialization complete")
-        
-    except Exception as e:
-        print(f"⚠️ About page data initialization error: {e}")
+                
+        except Exception as e:
+            result['error'] = str(e)
+    
+    return f"<pre>{json.dumps(result, indent=2)}</pre>"
 
 if __name__ == '__main__':
     app.run(debug=True)
