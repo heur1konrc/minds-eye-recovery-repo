@@ -22,9 +22,13 @@ const DirectPortfolio = () => {
       
       const data = await response.json()
       console.log('✅ Data received:', data)
-      console.log('📈 Image count:', data.length)
       
-      setImages(data)
+      // Filter out images that are set as About images
+      const portfolioImages = data.filter(image => !image.is_about)
+      console.log('📈 Portfolio image count (excluding About images):', portfolioImages.length)
+      console.log('🚫 About images excluded:', data.length - portfolioImages.length)
+      
+      setImages(portfolioImages)
       setLoading(false)
     } catch (err) {
       console.error('❌ Fetch error:', err)

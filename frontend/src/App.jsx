@@ -10,7 +10,7 @@ import SQLPortfolio from './pages/SQLPortfolio'
 import DirectPortfolio from './pages/DirectPortfolio'
 import AboutYou from './pages/AboutYou'
 import FeaturedPage from './pages/FeaturedPage'
-import BioPage from './pages/BioPage'
+
 import ContactPage from './pages/ContactPage'
 import CopyrightProtection from './components/CopyrightProtection'
 import './App.css'

@@ -10,7 +10,10 @@ const SimplePortfolio = () => {
       .then(response => response.json())
       .then(data => {
         console.log('Got data:', data)
-        setImages(data)
+        // Filter out images that are set as About images
+        const portfolioImages = data.filter(image => !image.is_about)
+        console.log('Portfolio images (excluding About):', portfolioImages.length)
+        setImages(portfolioImages)
         setLoading(false)
       })
       .catch(error => {

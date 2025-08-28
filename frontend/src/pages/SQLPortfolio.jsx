@@ -25,10 +25,15 @@ const SQLPortfolio = () => {
       console.log('📊 API Response data:', data);
       console.log('📈 Number of images received:', data.length);
       
-      setImages(data);
+      // Filter out images that are set as About images
+      const portfolioImages = data.filter(image => !image.is_about);
+      console.log('🚫 About images excluded:', data.length - portfolioImages.length);
+      console.log('📈 Portfolio images (excluding About):', portfolioImages.length);
+      
+      setImages(portfolioImages);
       setLoading(false);
       
-      console.log('✅ Images set in state:', data.length);
+      console.log('✅ Images set in state:', portfolioImages.length);
     } catch (error) {
       console.error('❌ Error fetching images:', error);
       setLoading(false);

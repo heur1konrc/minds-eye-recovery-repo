@@ -735,11 +735,11 @@ dashboard_html = '''
             background: #777;
         }
         .about-btn.active {
-            background: #2196F3;
+            background: #ff6b35;
             color: #fff;
         }
         .about-btn.active:hover {
-            background: #1976D2;
+            background: #e55a2b;
         }
         .message { 
             padding: 15px; 
