@@ -30,7 +30,6 @@ function App() {
           <Route path="/featured" element={<FeaturedPage />} />
           <Route path="/about" element={<AboutMindsEye />} />
           <Route path="/about-you" element={<AboutYou />} />
-          <Route path="/about-minds-eye" element={<AboutMindsEye />} />
           <Route path="/contact" element={<ContactPage />} />
         </Routes>
       </div>
