@@ -1446,3 +1446,18 @@ def show_data_contents():
     
     return f"<pre>{json.dumps(result, indent=2)}</pre>"
 
+
+        # Set the existing about image if none is set
+        about_image_file = os.path.join(data_dir, 'about_minds_eye_image.json')
+        if os.path.exists(about_image_file):
+            with open(about_image_file, 'r') as f:
+                image_data = json.load(f)
+                if image_data.get('filename') is None:
+                    # Check if about-minds-eye image exists and set it
+                    existing_image = "about-minds-eye-fe05c603.png"
+                    if os.path.exists(os.path.join(data_dir, existing_image)):
+                        image_data['filename'] = existing_image
+                        with open(about_image_file, 'w') as f:
+                            json.dump(image_data, f, indent=2)
+                        print(f"✅ Set existing About image: {existing_image}")
+
