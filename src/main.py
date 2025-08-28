@@ -443,6 +443,30 @@ def get_featured_image():
         traceback.print_exc()
         return jsonify({'error': 'Failed to load featured image'}), 500
 
+@app.route('/api/about-minds-eye')
+def get_about_minds_eye():
+    """API endpoint to get about-minds-eye page data"""
+    try:
+        # Import helper functions from admin routes
+        from src.routes.admin import load_about_content, get_about_minds_eye_image
+        
+        # Get content and image
+        content = load_about_content()
+        image_filename = get_about_minds_eye_image()
+        
+        return jsonify({
+            'content': content,
+            'image': image_filename,
+            'success': True
+        })
+        
+    except Exception as e:
+        print(f"Error in about-minds-eye API: {e}")
+        return jsonify({
+            'error': str(e),
+            'success': False
+        }), 500
+
 @app.route('/api/all-images')
 def get_all_images():
     """API endpoint to list all images in /data directory and database"""

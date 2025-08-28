@@ -10,7 +10,7 @@ import SQLPortfolio from './pages/SQLPortfolio'
 import DirectPortfolio from './pages/DirectPortfolio'
 import AboutYou from './pages/AboutYou'
 import FeaturedPage from './pages/FeaturedPage'
-
+import AboutMindsEye from './pages/AboutMindsEye'
 import ContactPage from './pages/ContactPage'
 import CopyrightProtection from './components/CopyrightProtection'
 import './App.css'
@@ -30,6 +30,7 @@ function App() {
           <Route path="/featured" element={<FeaturedPage />} />
           <Route path="/about" element={<AboutYou />} />
           <Route path="/about-you" element={<AboutYou />} />
+          <Route path="/about-minds-eye" element={<AboutMindsEye />} />
           <Route path="/contact" element={<ContactPage />} />
         </Routes>
       </div>

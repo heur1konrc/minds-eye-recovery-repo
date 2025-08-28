@@ -1139,31 +1139,27 @@ def about_management():
     # Load current about content
     about_content = load_about_content()
     
-    # Get about images
-    about_images = get_about_images()
+    # Get current about-minds-eye image
+    current_image = get_about_minds_eye_image()
     
     message = request.args.get('message', '')
     message_type = request.args.get('message_type', 'info')
     
     return render_template_string(ABOUT_MANAGEMENT_TEMPLATE, 
                                 about_content=about_content,
-                                about_images=about_images,
+                                current_image=current_image,
                                 message=message,
                                 message_type=message_type)
 
 @admin_bp.route('/admin/update-about-content', methods=['POST'])
 def update_about_content():
-    """Update about page content"""
+    """Update about-minds-eye page content"""
     if 'admin_logged_in' not in session:
         return redirect(url_for('admin.admin_login'))
     
     try:
         content = {
-            'title': request.form.get('title', 'About Mind\'s Eye Photography'),
-            'subtitle': request.form.get('subtitle', 'Where Moments Meet Imagination'),
-            'section_title': request.form.get('section_title', 'On Location'),
             'main_content': request.form.get('main_content', ''),
-            'bottom_content': request.form.get('bottom_content', ''),
             'signature': request.form.get('signature', 'Rick Corey')
         }
         
@@ -1175,7 +1171,7 @@ def update_about_content():
 
 @admin_bp.route('/admin/upload-about-image', methods=['POST'])
 def upload_about_image():
-    """Upload image for about page"""
+    """Upload image for about-minds-eye page (replaces current image like Featured)"""
     if 'admin_logged_in' not in session:
         return redirect(url_for('admin.admin_login'))
     
@@ -1189,14 +1185,18 @@ def upload_about_image():
         
         if file:
             # Generate unique filename
-            filename = f"about-{uuid.uuid4().hex[:8]}.{file.filename.rsplit('.', 1)[1].lower()}"
+            filename = f"about-minds-eye-{uuid.uuid4().hex[:8]}.{file.filename.rsplit('.', 1)[1].lower()}"
             filepath = os.path.join(PHOTOGRAPHY_ASSETS_DIR, filename)
             
             # Save file
             file.save(filepath)
             
-            # Add to about images list
-            add_about_image(filename)
+            # Replace the about-minds-eye image (like Featured Image does)
+            set_about_minds_eye_image(filename)
+            
+            return redirect(url_for('admin.about_management') + '?message=About image updated successfully!&message_type=success')
+    except Exception as e:
+        return redirect(url_for('admin.about_management') + f'?message=Upload failed: {str(e)}&message_type=error')
             
             return redirect(url_for('admin.about_management') + '?message=Image uploaded successfully!&message_type=success')
     except Exception as e:
@@ -1264,6 +1264,25 @@ def get_about_images():
         print(f"Error loading about images: {e}")
     return []
 
+def set_about_minds_eye_image(filename):
+    """Set the about-minds-eye image (replaces current like Featured Image)"""
+    about_image_file = os.path.join(os.path.dirname(PHOTOGRAPHY_ASSETS_DIR), 'about_minds_eye_image.json')
+    os.makedirs(os.path.dirname(about_image_file), exist_ok=True)
+    with open(about_image_file, 'w') as f:
+        json.dump({'filename': filename}, f, indent=2)
+
+def get_about_minds_eye_image():
+    """Get the current about-minds-eye image"""
+    about_image_file = os.path.join(os.path.dirname(PHOTOGRAPHY_ASSETS_DIR), 'about_minds_eye_image.json')
+    try:
+        if os.path.exists(about_image_file):
+            with open(about_image_file, 'r') as f:
+                data = json.load(f)
+                return data.get('filename')
+    except Exception as e:
+        print(f"Error loading about-minds-eye image: {e}")
+    return None
+
 def add_about_image(filename):
     """Add image to about page images list"""
     images = get_about_images()
@@ -1287,6 +1306,147 @@ def save_about_images(images):
 
 # About Management Template
 ABOUT_MANAGEMENT_TEMPLATE = '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>About Page Management</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #000; 
+            color: #fff; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            padding-bottom: 20px; 
+            border-bottom: 2px solid #333; 
+        }
+        h1 { color: #ff6b35; margin: 0; }
+        h2 { color: #ff6b35; margin-top: 30px; margin-bottom: 15px; }
+        .back-btn { 
+            background: #666; 
+            color: #fff; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+        }
+        .back-btn:hover { background: #777; }
+        .preview-btn { 
+            background: #007bff; 
+            color: #fff; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            margin-left: 10px; 
+        }
+        .preview-btn:hover { background: #0056b3; }
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            color: #ff6b35; 
+            font-weight: bold; 
+        }
+        input[type="text"], textarea, input[type="file"] { 
+            width: 100%; 
+            padding: 10px; 
+            background: #333; 
+            border: 1px solid #555; 
+            color: #fff; 
+            border-radius: 5px; 
+        }
+        textarea { 
+            height: 200px; 
+            resize: vertical; 
+        }
+        .btn { 
+            background: #ff6b35; 
+            color: #fff; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 16px; 
+        }
+        .btn:hover { background: #e55a2b; }
+        .message { 
+            padding: 15px; 
+            margin: 20px 0; 
+            border-radius: 5px; 
+        }
+        .success-message { 
+            background: #28a745; 
+            color: #fff; 
+        }
+        .error-message { 
+            background: #dc3545; 
+            color: #fff; 
+        }
+        .current-image { 
+            max-width: 300px; 
+            border-radius: 5px; 
+            margin-top: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>About Page Management</h1>
+        <div>
+            <a href="/admin/dashboard" class="back-btn">← Back to Admin</a>
+            <a href="/about-minds-eye" class="preview-btn" target="_blank">👁️ Preview About Page</a>
+        </div>
+    </div>
+
+    {% if message %}
+        <div class="message {{ 'success-message' if message_type == 'success' else 'error-message' }}">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <h2>Content Management</h2>
+    <form method="POST" action="/admin/update-about-content">
+        <div class="form-group">
+            <label for="main_content">Main Content:</label>
+            <textarea name="main_content" id="main_content" required>{{ about_content.main_content }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="signature">Signature:</label>
+            <input type="text" name="signature" id="signature" value="{{ about_content.signature }}" required>
+        </div>
+        
+        <button type="submit" class="btn">Update Content</button>
+    </form>
+
+    <h2>Image Management</h2>
+    <p>Upload a single image for the About page. This will replace the current image.</p>
+    
+    {% if current_image %}
+        <div>
+            <p><strong>Current Image:</strong></p>
+            <img src="/assets/{{ current_image }}" alt="Current About Image" class="current-image">
+        </div>
+    {% endif %}
+    
+    <form method="POST" action="/admin/upload-about-image" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="image">Upload New Image:</label>
+            <input type="file" name="image" id="image" accept="image/*" required>
+        </div>
+        
+        <button type="submit" class="btn">Upload Image</button>
+    </form>
+</body>
+</html>
+'''
 <!DOCTYPE html>
 <html>
 <head>
