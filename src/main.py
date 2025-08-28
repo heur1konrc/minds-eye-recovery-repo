@@ -1475,6 +1475,9 @@ def set_about_image_direct(filename):
 def about_minds_eye_page():
     """Serve the about-minds-eye page"""
     try:
+        # Import functions from admin module
+        from src.routes.admin import load_about_content, get_about_minds_eye_image
+        
         # Load about content
         about_content = load_about_content()
         about_image = get_about_minds_eye_image()
