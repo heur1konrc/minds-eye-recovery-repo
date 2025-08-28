@@ -11,7 +11,8 @@ const Navigation = () => {
     { path: '/', label: 'Home' },
     { path: '/portfolio', label: 'Portfolio' },
     { path: '/featured', label: 'Featured' },
-    { path: '/about-minds-eye', label: 'About' },
+    { path: '/about', label: 'About' },
+    { path: '/about-minds-eye', label: 'Info', external: true },
     { path: '/contact', label: 'Contact' }
   ]
 
@@ -43,25 +44,35 @@ const Navigation = () => {
             {/* Desktop Navigation Links */}
             <div className="hidden md:flex space-x-8">
               {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`relative transition-colors ${
-                    location.pathname === item.path
-                      ? 'text-orange-400'
-                      : 'text-white hover:text-orange-400'
-                  }`}
-                >
-                  {item.label}
-                  {location.pathname === item.path && (
-                    <motion.div
-                      layoutId="activeTab"
-                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-orange-500"
-                      initial={false}
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    />
-                  )}
-                </Link>
+                item.external ? (
+                  <a
+                    key={item.path}
+                    href={item.path}
+                    className="text-white hover:text-orange-400 transition-colors"
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`relative transition-colors ${
+                      location.pathname === item.path
+                        ? 'text-orange-400'
+                        : 'text-white hover:text-orange-400'
+                    }`}
+                  >
+                    {item.label}
+                    {location.pathname === item.path && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-orange-500"
+                        initial={false}
+                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      />
+                    )}
+                  </Link>
+                )
               ))}
             </div>
             
@@ -149,17 +160,26 @@ const Navigation = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <Link
-                        to={item.path}
-                        onClick={closeMobileMenu}
-                        className={`block px-6 py-4 text-lg transition-colors border-l-4 ${
-                          location.pathname === item.path
-                            ? 'text-orange-400 border-orange-500 bg-slate-800/50'
-                            : 'text-white border-transparent hover:text-orange-400 hover:border-orange-500/50 hover:bg-slate-800/30'
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
+                      {item.external ? (
+                        <a
+                          href={item.path}
+                          className="block px-6 py-4 text-lg transition-colors border-l-4 text-white border-transparent hover:text-orange-400 hover:border-orange-500/50 hover:bg-slate-800/30"
+                        >
+                          {item.label}
+                        </a>
+                      ) : (
+                        <Link
+                          to={item.path}
+                          onClick={closeMobileMenu}
+                          className={`block px-6 py-4 text-lg transition-colors border-l-4 ${
+                            location.pathname === item.path
+                              ? 'text-orange-400 border-orange-500 bg-slate-800/50'
+                              : 'text-white border-transparent hover:text-orange-400 hover:border-orange-500/50 hover:bg-slate-800/30'
+                          }`}
+                        >
+                          {item.label}
+                        </Link>
+                      )}
                     </motion.div>
                   ))}
                 </div>
