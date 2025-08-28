@@ -28,7 +28,7 @@ function App() {
           <Route path="/working" element={<WorkingPortfolio />} />
           <Route path="/sql" element={<SQLPortfolio />} />
           <Route path="/featured" element={<FeaturedPage />} />
-          <Route path="/about" element={<AboutYou />} />
+          <Route path="/about-test" element={<AboutYou />} />
           <Route path="/about-you" element={<AboutYou />} />
           <Route path="/contact" element={<ContactPage />} />
         </Routes>
