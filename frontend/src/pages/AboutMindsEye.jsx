@@ -87,7 +87,7 @@ const AboutMindsEye = () => {
           {/* IMAGE FLOATED LEFT WITH TEXT WRAPPED */}
           {aboutData.image && (
             <img 
-              src={`/assets/${aboutData.image}`} 
+              src={`/data/${aboutData.image}`} 
               alt="About Mind's Eye Photography"
               className="float-left mr-6 mb-4 w-80 h-auto rounded-lg shadow-lg cursor-pointer"
               onClick={openFullscreen}
@@ -126,7 +126,7 @@ const AboutMindsEye = () => {
               ×
             </button>
             <img
-              src={`/assets/${aboutData.image}`}
+              src={`/data/${aboutData.image}`}
               alt="About Mind's Eye Photography - Fullscreen"
               className="max-w-full max-h-full object-contain"
             />

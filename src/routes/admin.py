@@ -1224,7 +1224,7 @@ def delete_about_image():
 # About page helper functions
 def load_about_content():
     """Load about page content"""
-    about_file = os.path.join(os.path.dirname(PHOTOGRAPHY_ASSETS_DIR), 'about_content.json')
+    about_file = '/data/about_content.json'
     try:
         if os.path.exists(about_file):
             with open(about_file, 'r') as f:
@@ -1244,7 +1244,7 @@ def load_about_content():
 
 def save_about_content(content):
     """Save about page content"""
-    about_file = os.path.join(os.path.dirname(PHOTOGRAPHY_ASSETS_DIR), 'about_content.json')
+    about_file = '/data/about_content.json'
     os.makedirs(os.path.dirname(about_file), exist_ok=True)
     with open(about_file, 'w') as f:
         json.dump(content, f, indent=2)
@@ -1262,14 +1262,14 @@ def get_about_images():
 
 def set_about_minds_eye_image(filename):
     """Set the about-minds-eye image (replaces current like Featured Image)"""
-    about_image_file = os.path.join(os.path.dirname(PHOTOGRAPHY_ASSETS_DIR), 'about_minds_eye_image.json')
+    about_image_file = '/data/about_minds_eye_image.json'
     os.makedirs(os.path.dirname(about_image_file), exist_ok=True)
     with open(about_image_file, 'w') as f:
         json.dump({'filename': filename}, f, indent=2)
 
 def get_about_minds_eye_image():
     """Get the current about-minds-eye image"""
-    about_image_file = os.path.join(os.path.dirname(PHOTOGRAPHY_ASSETS_DIR), 'about_minds_eye_image.json')
+    about_image_file = '/data/about_minds_eye_image.json'
     try:
         if os.path.exists(about_image_file):
             with open(about_image_file, 'r') as f:

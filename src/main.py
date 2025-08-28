@@ -1104,7 +1104,7 @@ def about_page():
     
     <div class="container">
         <div class="page-title">
-            <h1>{about_content.get('title', 'About Mind\'s Eye Photography')}</h1>
+            <h1>{about_content.get('title', "About Mind's Eye Photography")}</h1>
             <p>{about_content.get('subtitle', 'Where Moments Meet Imagination')}</p>
         </div>
         
