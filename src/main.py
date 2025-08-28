@@ -1584,7 +1584,7 @@ def about_minds_eye_page():
                 <a href="/">Home</a>
                 <a href="/portfolio">Portfolio</a>
                 <a href="/featured">Featured</a>
-                <a href="/about">About</a>
+                <a href="/about-minds-eye" style="background: #334155;">Info</a>
                 <a href="/contact">Contact</a>
             </div>
         </nav>
