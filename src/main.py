@@ -1008,8 +1008,8 @@ def serve_data_file(filename):
         return "File not found", 404
 
 
-# @app.route('/about')
-# def about_page():
+@app.route('/about')
+def about_page():
     """Clean About page using Image table with is_about flag"""
     try:
         from src.models import Image
