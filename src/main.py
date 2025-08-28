@@ -1620,3 +1620,56 @@ def about_minds_eye_page():
     except Exception as e:
         return f"Error loading about page: {str(e)}"
 
+
+
+@app.route('/fix-navigation.js')
+def fix_navigation_js():
+    """JavaScript to fix the main site navigation"""
+    js_code = """
+// Fix navigation to add Info link
+(function() {
+    function addInfoLink() {
+        // Find the navigation container
+        const nav = document.querySelector('nav .hidden.md\\:flex');
+        if (nav && !document.querySelector('a[href="/about-minds-eye"]')) {
+            // Find the About link and replace it
+            const aboutLink = Array.from(nav.querySelectorAll('a')).find(a => a.textContent.trim() === 'About');
+            if (aboutLink) {
+                aboutLink.textContent = 'Info';
+                aboutLink.href = '/about-minds-eye';
+                aboutLink.onclick = function(e) {
+                    e.preventDefault();
+                    window.location.href = '/about-minds-eye';
+                };
+            }
+        }
+        
+        // Also fix mobile navigation
+        const mobileNav = document.querySelector('.flex-1.py-6');
+        if (mobileNav && !document.querySelector('a[href="/about-minds-eye"]')) {
+            const mobileAboutLink = Array.from(mobileNav.querySelectorAll('a')).find(a => a.textContent.trim() === 'About');
+            if (mobileAboutLink) {
+                mobileAboutLink.textContent = 'Info';
+                mobileAboutLink.href = '/about-minds-eye';
+                mobileAboutLink.onclick = function(e) {
+                    e.preventDefault();
+                    window.location.href = '/about-minds-eye';
+                };
+            }
+        }
+    }
+    
+    // Run immediately and also after React renders
+    addInfoLink();
+    setTimeout(addInfoLink, 1000);
+    setTimeout(addInfoLink, 3000);
+    
+    // Watch for navigation changes
+    const observer = new MutationObserver(addInfoLink);
+    observer.observe(document.body, { childList: true, subtree: true });
+})();
+    """
+    
+    from flask import Response
+    return Response(js_code, mimetype='application/javascript')
+
