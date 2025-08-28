@@ -1626,46 +1626,76 @@ def about_minds_eye_page():
 def fix_navigation_js():
     """JavaScript to fix the main site navigation"""
     js_code = """
-// Fix navigation to add Info link
+// Remove About button and add Info button site-wide
 (function() {
-    function addInfoLink() {
-        // Find the navigation container
+    function fixNavigation() {
+        // Fix desktop navigation
         const nav = document.querySelector('nav .hidden.md\\:flex');
-        if (nav && !document.querySelector('a[href="/about-minds-eye"]')) {
-            // Find the About link and replace it
+        if (nav) {
+            // Remove About link
             const aboutLink = Array.from(nav.querySelectorAll('a')).find(a => a.textContent.trim() === 'About');
             if (aboutLink) {
-                aboutLink.textContent = 'Info';
-                aboutLink.href = '/about-minds-eye';
-                aboutLink.onclick = function(e) {
-                    e.preventDefault();
-                    window.location.href = '/about-minds-eye';
-                };
+                aboutLink.remove();
+            }
+            
+            // Add Info link if not already there
+            if (!Array.from(nav.querySelectorAll('a')).find(a => a.textContent.trim() === 'Info')) {
+                const contactLink = Array.from(nav.querySelectorAll('a')).find(a => a.textContent.trim() === 'Contact');
+                if (contactLink) {
+                    const infoLink = document.createElement('a');
+                    infoLink.href = '/about-minds-eye';
+                    infoLink.textContent = 'Info';
+                    infoLink.className = 'text-white hover:text-orange-400 transition-colors';
+                    infoLink.onclick = function(e) {
+                        e.preventDefault();
+                        window.location.href = '/about-minds-eye';
+                    };
+                    contactLink.parentNode.insertBefore(infoLink, contactLink);
+                }
             }
         }
         
-        // Also fix mobile navigation
+        // Fix mobile navigation
         const mobileNav = document.querySelector('.flex-1.py-6');
-        if (mobileNav && !document.querySelector('a[href="/about-minds-eye"]')) {
+        if (mobileNav) {
+            // Remove About link
             const mobileAboutLink = Array.from(mobileNav.querySelectorAll('a')).find(a => a.textContent.trim() === 'About');
             if (mobileAboutLink) {
-                mobileAboutLink.textContent = 'Info';
-                mobileAboutLink.href = '/about-minds-eye';
-                mobileAboutLink.onclick = function(e) {
-                    e.preventDefault();
-                    window.location.href = '/about-minds-eye';
-                };
+                mobileAboutLink.parentElement.remove();
+            }
+            
+            // Add Info link if not already there
+            if (!Array.from(mobileNav.querySelectorAll('a')).find(a => a.textContent.trim() === 'Info')) {
+                const mobileContactLink = Array.from(mobileNav.querySelectorAll('a')).find(a => a.textContent.trim() === 'Contact');
+                if (mobileContactLink) {
+                    const mobileInfoDiv = document.createElement('div');
+                    mobileInfoDiv.className = 'opacity-1 translate-x-0';
+                    
+                    const mobileInfoLink = document.createElement('a');
+                    mobileInfoLink.href = '/about-minds-eye';
+                    mobileInfoLink.textContent = 'Info';
+                    mobileInfoLink.className = 'block px-6 py-4 text-lg transition-colors border-l-4 text-white border-transparent hover:text-orange-400 hover:border-orange-500/50 hover:bg-slate-800/30';
+                    mobileInfoLink.onclick = function(e) {
+                        e.preventDefault();
+                        window.location.href = '/about-minds-eye';
+                    };
+                    
+                    mobileInfoDiv.appendChild(mobileInfoLink);
+                    mobileContactLink.parentElement.parentNode.insertBefore(mobileInfoDiv, mobileContactLink.parentElement);
+                }
             }
         }
     }
     
-    // Run immediately and also after React renders
-    addInfoLink();
-    setTimeout(addInfoLink, 1000);
-    setTimeout(addInfoLink, 3000);
+    // Run immediately and repeatedly to catch React renders
+    fixNavigation();
+    setTimeout(fixNavigation, 500);
+    setTimeout(fixNavigation, 1000);
+    setTimeout(fixNavigation, 2000);
+    setTimeout(fixNavigation, 3000);
     
     // Watch for navigation changes
-    const observer = new MutationObserver(addInfoLink);
+    const observer = new MutationObserver(fixNavigation);
     observer.observe(document.body, { childList: true, subtree: true });
 })();
     """
