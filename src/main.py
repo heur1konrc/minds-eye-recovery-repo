@@ -1448,3 +1448,25 @@ def show_data_contents():
 
 if __name__ == '__main__':
     app.run(debug=True)
+@app.route('/set-about-image/<filename>')
+def set_about_image_direct(filename):
+    """Direct endpoint to set About page image from existing file"""
+    try:
+        import json
+        data_dir = '/data'
+        about_image_file = os.path.join(data_dir, 'about_minds_eye_image.json')
+        
+        # Check if the image file exists
+        image_path = os.path.join(data_dir, filename)
+        if not os.path.exists(image_path):
+            return f"Image {filename} not found in /data directory"
+        
+        # Update the about image JSON
+        image_data = {"filename": filename}
+        with open(about_image_file, 'w') as f:
+            json.dump(image_data, f, indent=2)
+        
+        return f"✅ Set About page image to: {filename}"
+    except Exception as e:
+        return f"Error: {str(e)}"
+
