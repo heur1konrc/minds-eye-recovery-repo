@@ -846,6 +846,298 @@ def serve_data_file(filename):
 
 
 
+@app.route('/about')
+def about_page():
+    """About page matching the exact design from screenshot"""
+    try:
+        # Load about content from admin system
+        about_content = load_about_content()
+        about_images = get_about_images()
+        
+        # Create the 2x2 image grid HTML
+        image_grid_html = ""
+        if about_images:
+            # Use first 4 images for the 2x2 grid
+            for i, filename in enumerate(about_images[:4]):
+                image_grid_html += f'''
+                    <div class="about-image">
+                        <img src="/data/{filename}" alt="About image {i+1}" />
+                    </div>
+                '''
+        else:
+            # Fallback: try to get any images from the database
+            from src.models import Image
+            fallback_images = Image.query.limit(4).all()
+            if fallback_images:
+                for i, img in enumerate(fallback_images):
+                    image_grid_html += f'''
+                        <div class="about-image">
+                            <img src="/data/{img.filename}" alt="{img.title}" />
+                        </div>
+                    '''
+            else:
+                # Final fallback: placeholder images
+                for i in range(4):
+                    image_grid_html += f'''
+                        <div class="about-image">
+                            <div class="placeholder-image">Photo {i+1}</div>
+                        </div>
+                    '''
+        
+        # Format bottom content with proper paragraphs
+        bottom_paragraphs = ""
+        if about_content.get('bottom_content'):
+            paragraphs = about_content['bottom_content'].split('\n\n')
+            for paragraph in paragraphs:
+                if paragraph.strip():
+                    bottom_paragraphs += f'<p>{paragraph.strip()}</p>\n            '
+        
+        return f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Mind's Eye Photography</title>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        
+        body {{
+            background-color: #334155;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+        }}
+        
+        .header {{
+            background-color: #1e293b;
+            padding: 1rem 0;
+        }}
+        
+        .nav {{
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }}
+        
+        .logo {{
+            color: #f97316;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }}
+        
+        .nav-links {{
+            display: flex;
+            gap: 2rem;
+        }}
+        
+        .nav-links a {{
+            color: #f8fafc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }}
+        
+        .nav-links a:hover,
+        .nav-links a.active {{
+            color: #f97316;
+        }}
+        
+        .container {{
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }}
+        
+        .page-title {{
+            text-align: center;
+            margin-bottom: 3rem;
+        }}
+        
+        .page-title h1 {{
+            color: #f97316;
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }}
+        
+        .page-title p {{
+            color: #cbd5e1;
+            font-size: 1.25rem;
+        }}
+        
+        .content-section {{
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }}
+        
+        .image-grid {{
+            flex: 0 0 400px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }}
+        
+        .about-image {{
+            aspect-ratio: 1;
+            overflow: hidden;
+            border-radius: 8px;
+        }}
+        
+        .about-image img {{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }}
+        
+        .placeholder-image {{
+            width: 100%;
+            height: 100%;
+            background: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }}
+        
+        .text-content {{
+            flex: 1;
+        }}
+        
+        .section-title {{
+            color: #f97316;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }}
+        
+        .text-content p {{
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            color: #e2e8f0;
+        }}
+        
+        .text-content strong {{
+            color: #f8fafc;
+        }}
+        
+        .signature {{
+            text-align: right;
+            margin-top: 2rem;
+            color: #f97316;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }}
+        
+        .bottom-text {{
+            margin-top: 3rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+        }}
+        
+        .bottom-text p {{
+            margin-bottom: 1.5rem;
+        }}
+        
+        @media (max-width: 768px) {{
+            .content-section {{
+                flex-direction: column;
+            }}
+            
+            .image-grid {{
+                flex: none;
+                max-width: 300px;
+                margin: 0 auto;
+            }}
+            
+            .page-title h1 {{
+                font-size: 2rem;
+            }}
+        }}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">Mind's Eye Photography</a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/portfolio">Portfolio</a>
+                <a href="/featured">Featured</a>
+                <a href="/about" class="active">About</a>
+                <a href="/contact">Contact</a>
+            </div>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <div class="page-title">
+            <h1>{about_content.get('title', 'About Mind\'s Eye Photography')}</h1>
+            <p>{about_content.get('subtitle', 'Where Moments Meet Imagination')}</p>
+        </div>
+        
+        <div class="content-section">
+            <div class="image-grid">
+                {image_grid_html}
+            </div>
+            
+            <div class="text-content">
+                <h2 class="section-title">{about_content.get('section_title', 'On Location')}</h2>
+                <p>{about_content.get('main_content', 'Content not yet configured. Please use the admin panel to add content.')}</p>
+            </div>
+        </div>
+        
+        <div class="bottom-text">
+            {bottom_paragraphs}
+        </div>
+        
+        <div class="signature">{about_content.get('signature', 'Rick Corey')}</div>
+    </div>
+</body>
+</html>'''
+    except Exception as e:
+        return f"Error loading about page: {str(e)}", 500
+
+def load_about_content():
+    """Load about page content"""
+    about_file = os.path.join('/data', 'about_content.json')
+    try:
+        if os.path.exists(about_file):
+            with open(about_file, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading about content: {e}")
+    
+    # Default content
+    return {
+        'title': 'About Mind\'s Eye Photography',
+        'subtitle': 'Where Moments Meet Imagination',
+        'section_title': 'On Location',
+        'main_content': 'Born and raised right here in Madison, Wisconsin, I\'m a creative spirit with a passion for bringing visions to life. My journey has woven through various rewarding paths – as a musician/songwriter, a Teacher, a REALTOR, and a Small Business Owner. Each of these roles has fueled my inspired, creative, and driven approach to everything I do, especially when it comes to photography.',
+        'bottom_content': 'At the heart of Mind\'s Eye Photography: Where Moments Meet Imagination is my dedication to you. While I cherish the fulfillment of capturing moments that spark my own imagination, my true passion lies in doing the same for my clients. Based in Madison, I frequently travel across the state, always on the lookout for that next inspiring scene.\n\nFor me, client satisfaction isn\'t just a goal – it\'s the foundation of every interaction. I pour my energy into ensuring you not only love your photos but also enjoy the entire experience. It\'s truly rewarding to see clients transform into lifelong friends, and that\'s the kind of connection I strive to build with everyone I work with.',
+        'signature': 'Rick Corey'
+    }
+
+def get_about_images():
+    """Get list of about page images"""
+    about_images_file = os.path.join('/data', 'about_images.json')
+    try:
+        if os.path.exists(about_images_file):
+            with open(about_images_file, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading about images: {e}")
+    return []
+
+
 # React Frontend Routes
 @app.route('/assets/<path:filename>')
 def serve_react_assets(filename):

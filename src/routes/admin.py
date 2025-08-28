@@ -801,6 +801,7 @@ dashboard_html = '''
     <div class="admin-links">
         <a href="/admin">🖼️ Portfolio Management</a>
         <a href="/admin/featured-image">⭐ Featured Image</a>
+        <a href="/admin/about-management">📖 About Page Management</a>
         <a href="/admin/category-management">🏷️ Category Management</a>
         <a href="/admin/backup-system">🛡️ Backup System</a>
     </div>
@@ -901,9 +902,6 @@ dashboard_html = '''
                         <button type="button" class="edit-btn" onclick="openEditModal('{{ item.id }}', '{{ item.title|replace("'", "\\'") }}', '{{ item.description|replace("'", "\\'") }}')">Edit</button>
                         <button type="button" class="slideshow-btn {{ 'active' if item.is_slideshow_background else '' }}" onclick="toggleSlideshow('{{ item.id }}', {{ 'true' if item.is_slideshow_background else 'false' }})">
                             {{ '★ In Slideshow' if item.is_slideshow_background else '☆ Add to Slideshow' }}
-                        </button>
-                        <button type="button" class="about-btn {{ 'active' if item.is_about else '' }}" onclick="toggleAbout('{{ item.id }}', {{ 'true' if item.is_about else 'false' }})">
-                            {{ '📖 About Image' if item.is_about else '📖 Set as About' }}
                         </button>
                         <form method="POST" action="/admin/delete" style="display: inline;">
                             <input type="hidden" name="image_id" value="{{ item.id }}">
@@ -1128,4 +1126,363 @@ dashboard_html = '''
 
 
 
+
+
+
+# About Page Management Routes
+@admin_bp.route('/admin/about-management')
+def about_management():
+    """About page management interface"""
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin.admin_login'))
+    
+    # Load current about content
+    about_content = load_about_content()
+    
+    # Get about images
+    about_images = get_about_images()
+    
+    message = request.args.get('message', '')
+    message_type = request.args.get('message_type', 'info')
+    
+    return render_template_string(ABOUT_MANAGEMENT_TEMPLATE, 
+                                about_content=about_content,
+                                about_images=about_images,
+                                message=message,
+                                message_type=message_type)
+
+@admin_bp.route('/admin/update-about-content', methods=['POST'])
+def update_about_content():
+    """Update about page content"""
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin.admin_login'))
+    
+    try:
+        content = {
+            'title': request.form.get('title', 'About Mind\'s Eye Photography'),
+            'subtitle': request.form.get('subtitle', 'Where Moments Meet Imagination'),
+            'section_title': request.form.get('section_title', 'On Location'),
+            'main_content': request.form.get('main_content', ''),
+            'bottom_content': request.form.get('bottom_content', ''),
+            'signature': request.form.get('signature', 'Rick Corey')
+        }
+        
+        save_about_content(content)
+        
+        return redirect(url_for('admin.about_management') + '?message=About content updated successfully!&message_type=success')
+    except Exception as e:
+        return redirect(url_for('admin.about_management') + f'?message=Update failed: {str(e)}&message_type=error')
+
+@admin_bp.route('/admin/upload-about-image', methods=['POST'])
+def upload_about_image():
+    """Upload image for about page"""
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin.admin_login'))
+    
+    try:
+        if 'image' not in request.files:
+            return redirect(url_for('admin.about_management') + '?message=No image file selected&message_type=error')
+        
+        file = request.files['image']
+        if file.filename == '':
+            return redirect(url_for('admin.about_management') + '?message=No image file selected&message_type=error')
+        
+        if file:
+            # Generate unique filename
+            filename = f"about-{uuid.uuid4().hex[:8]}.{file.filename.rsplit('.', 1)[1].lower()}"
+            filepath = os.path.join(PHOTOGRAPHY_ASSETS_DIR, filename)
+            
+            # Save file
+            file.save(filepath)
+            
+            # Add to about images list
+            add_about_image(filename)
+            
+            return redirect(url_for('admin.about_management') + '?message=Image uploaded successfully!&message_type=success')
+    except Exception as e:
+        return redirect(url_for('admin.about_management') + f'?message=Upload failed: {str(e)}&message_type=error')
+
+@admin_bp.route('/admin/delete-about-image', methods=['POST'])
+def delete_about_image():
+    """Delete about page image"""
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin.admin_login'))
+    
+    try:
+        filename = request.form.get('filename')
+        if not filename:
+            return redirect(url_for('admin.about_management') + '?message=No filename provided&message_type=error')
+        
+        # Remove from filesystem
+        filepath = os.path.join(PHOTOGRAPHY_ASSETS_DIR, filename)
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        
+        # Remove from about images list
+        remove_about_image(filename)
+        
+        return redirect(url_for('admin.about_management') + '?message=Image deleted successfully!&message_type=success')
+    except Exception as e:
+        return redirect(url_for('admin.about_management') + f'?message=Delete failed: {str(e)}&message_type=error')
+
+# About page helper functions
+def load_about_content():
+    """Load about page content"""
+    about_file = os.path.join(os.path.dirname(PHOTOGRAPHY_ASSETS_DIR), 'about_content.json')
+    try:
+        if os.path.exists(about_file):
+            with open(about_file, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading about content: {e}")
+    
+    # Default content
+    return {
+        'title': 'About Mind\'s Eye Photography',
+        'subtitle': 'Where Moments Meet Imagination',
+        'section_title': 'On Location',
+        'main_content': 'Born and raised right here in Madison, Wisconsin, I\'m a creative spirit with a passion for bringing visions to life. My journey has woven through various rewarding paths – as a musician/songwriter, a Teacher, a REALTOR, and a Small Business Owner. Each of these roles has fueled my inspired, creative, and driven approach to everything I do, especially when it comes to photography.',
+        'bottom_content': 'At the heart of Mind\'s Eye Photography: Where Moments Meet Imagination is my dedication to you. While I cherish the fulfillment of capturing moments that spark my own imagination, my true passion lies in doing the same for my clients. Based in Madison, I frequently travel across the state, always on the lookout for that next inspiring scene.\n\nFor me, client satisfaction isn\'t just a goal – it\'s the foundation of every interaction. I pour my energy into ensuring you not only love your photos but also enjoy the entire experience. It\'s truly rewarding to see clients transform into lifelong friends, and that\'s the kind of connection I strive to build with everyone I work with.',
+        'signature': 'Rick Corey'
+    }
+
+def save_about_content(content):
+    """Save about page content"""
+    about_file = os.path.join(os.path.dirname(PHOTOGRAPHY_ASSETS_DIR), 'about_content.json')
+    os.makedirs(os.path.dirname(about_file), exist_ok=True)
+    with open(about_file, 'w') as f:
+        json.dump(content, f, indent=2)
+
+def get_about_images():
+    """Get list of about page images"""
+    about_images_file = os.path.join(os.path.dirname(PHOTOGRAPHY_ASSETS_DIR), 'about_images.json')
+    try:
+        if os.path.exists(about_images_file):
+            with open(about_images_file, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading about images: {e}")
+    return []
+
+def add_about_image(filename):
+    """Add image to about page images list"""
+    images = get_about_images()
+    if filename not in images:
+        images.append(filename)
+        save_about_images(images)
+
+def remove_about_image(filename):
+    """Remove image from about page images list"""
+    images = get_about_images()
+    if filename in images:
+        images.remove(filename)
+        save_about_images(images)
+
+def save_about_images(images):
+    """Save about page images list"""
+    about_images_file = os.path.join(os.path.dirname(PHOTOGRAPHY_ASSETS_DIR), 'about_images.json')
+    os.makedirs(os.path.dirname(about_images_file), exist_ok=True)
+    with open(about_images_file, 'w') as f:
+        json.dump(images, f, indent=2)
+
+# About Management Template
+ABOUT_MANAGEMENT_TEMPLATE = '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>About Page Management</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #000; 
+            color: #fff; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            padding-bottom: 20px; 
+            border-bottom: 2px solid #333; 
+        }
+        h1 { color: #ff6b35; margin: 0; }
+        h2 { color: #ff6b35; margin-top: 30px; margin-bottom: 15px; }
+        .back-btn { 
+            background: #666; 
+            color: #fff; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+        }
+        .back-btn:hover { background: #777; }
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            color: #ff6b35; 
+            font-weight: bold; 
+        }
+        input[type="text"], textarea { 
+            width: 100%; 
+            padding: 10px; 
+            background: #333; 
+            border: 1px solid #555; 
+            color: #fff; 
+            border-radius: 5px; 
+        }
+        textarea { 
+            height: 100px; 
+            resize: vertical; 
+        }
+        .large-textarea { 
+            height: 200px; 
+        }
+        .btn { 
+            background: #ff6b35; 
+            color: #fff; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 16px; 
+        }
+        .btn:hover { background: #e55a2b; }
+        .btn-danger { 
+            background: #dc3545; 
+        }
+        .btn-danger:hover { 
+            background: #c82333; 
+        }
+        .message { 
+            padding: 15px; 
+            margin: 20px 0; 
+            border-radius: 5px; 
+        }
+        .success-message { 
+            background: #28a745; 
+            color: #fff; 
+        }
+        .error-message { 
+            background: #dc3545; 
+            color: #fff; 
+        }
+        .images-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 20px; 
+            margin-top: 20px; 
+        }
+        .image-item { 
+            background: #333; 
+            padding: 15px; 
+            border-radius: 8px; 
+        }
+        .image-item img { 
+            width: 100%; 
+            height: 150px; 
+            object-fit: cover; 
+            border-radius: 5px; 
+        }
+        .image-item .filename { 
+            margin: 10px 0 5px 0; 
+            font-size: 12px; 
+            color: #ccc; 
+        }
+        .preview-link { 
+            display: inline-block; 
+            margin-top: 20px; 
+            background: #007bff; 
+            color: #fff; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+        }
+        .preview-link:hover { 
+            background: #0056b3; 
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>About Page Management</h1>
+        <a href="/admin" class="back-btn">← Back to Admin</a>
+    </div>
+    
+    {% if message %}
+    <div class="message {{ message_type }}-message">
+        {{ message }}
+    </div>
+    {% endif %}
+    
+    <a href="/about" class="preview-link" target="_blank">👁️ Preview About Page</a>
+    
+    <h2>Content Management</h2>
+    <form method="POST" action="/admin/update-about-content">
+        <div class="form-group">
+            <label for="title">Page Title:</label>
+            <input type="text" id="title" name="title" value="{{ about_content.title }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="subtitle">Subtitle:</label>
+            <input type="text" id="subtitle" name="subtitle" value="{{ about_content.subtitle }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="section_title">Section Title:</label>
+            <input type="text" id="section_title" name="section_title" value="{{ about_content.section_title }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="main_content">Main Content (first paragraph):</label>
+            <textarea id="main_content" name="main_content" class="large-textarea" required>{{ about_content.main_content }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="bottom_content">Bottom Content (additional paragraphs):</label>
+            <textarea id="bottom_content" name="bottom_content" class="large-textarea" required>{{ about_content.bottom_content }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="signature">Signature:</label>
+            <input type="text" id="signature" name="signature" value="{{ about_content.signature }}" required>
+        </div>
+        
+        <button type="submit" class="btn">Update Content</button>
+    </form>
+    
+    <h2>Image Management</h2>
+    <p>Upload images for the 2x2 grid on the About page. The first 4 images will be displayed.</p>
+    
+    <form method="POST" action="/admin/upload-about-image" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="image">Upload Image:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+        </div>
+        <button type="submit" class="btn">Upload Image</button>
+    </form>
+    
+    {% if about_images %}
+    <div class="images-grid">
+        {% for filename in about_images %}
+        <div class="image-item">
+            <img src="/data/{{ filename }}" alt="{{ filename }}">
+            <div class="filename">{{ filename }}</div>
+            <form method="POST" action="/admin/delete-about-image" style="margin-top: 10px;">
+                <input type="hidden" name="filename" value="{{ filename }}">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this image?')">Delete</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color: #ccc; margin-top: 20px;">No images uploaded yet.</p>
+    {% endif %}
+</body>
+</html>
+'''
 
