@@ -90,7 +90,7 @@ const AboutMindsEye = () => {
               <img 
                 src={`/data/${aboutData.image}`} 
                 alt="About Mind's Eye Photography"
-                className="w-100 h-auto rounded-lg shadow-lg cursor-pointer"
+                className="w-120 h-auto rounded-lg shadow-lg cursor-pointer"
                 onClick={openFullscreen}
               />
               <p className="text-slate-400 text-sm mt-2 text-center italic">
