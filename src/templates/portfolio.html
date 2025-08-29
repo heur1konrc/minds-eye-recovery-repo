@@ -10,6 +10,134 @@
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
             min-height: 100vh;
         }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            animation: scaleIn 0.3s ease-in-out;
+        }
+        
+        .modal-image {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: -50px;
+            right: -10px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 107, 53, 0.8);
+            transform: scale(1.1);
+        }
+        
+        .modal-info {
+            position: absolute;
+            bottom: -60px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #f97316;
+        }
+        
+        .modal-description {
+            font-size: 1rem;
+            color: #d1d5db;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Cursor pointer for clickable images */
+        .portfolio-image {
+            cursor: pointer;
+        }
+        
+        .portfolio-image:hover {
+            cursor: zoom-in;
+        }
+        
+        /* Loading spinner */
+        .modal-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #f97316;
+            font-size: 2rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-white">
@@ -48,8 +176,11 @@
                         <img 
                             src="/static/assets/{{ image.filename }}" 
                             alt="{{ image.title }}"
-                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            class="portfolio-image w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             loading="lazy"
+                            data-title="{{ image.title }}"
+                            data-description="{{ image.description or '' }}"
+                            onclick="openModal(this)"
                         >
                     </div>
                     <div class="p-4">
@@ -70,6 +201,98 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- Modal Structure -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div class="modal-loading spinner" id="modalLoading">⟳</div>
+            <img id="modalImage" class="modal-image" style="display: none;">
+            <div class="modal-info" id="modalInfo" style="display: none;">
+                <div class="modal-title" id="modalTitle"></div>
+                <div class="modal-description" id="modalDescription"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalInfo = document.getElementById('modalInfo');
+        const modalLoading = document.getElementById('modalLoading');
+
+        function openModal(imgElement) {
+            const src = imgElement.src;
+            const title = imgElement.getAttribute('data-title');
+            const description = imgElement.getAttribute('data-description');
+
+            // Show modal and loading spinner
+            modal.classList.add('active');
+            modalLoading.style.display = 'block';
+            modalImage.style.display = 'none';
+            modalInfo.style.display = 'none';
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+
+            // Load the image
+            const img = new Image();
+            img.onload = function() {
+                modalImage.src = src;
+                modalTitle.textContent = title;
+                modalDescription.textContent = description;
+                
+                // Hide loading, show image and info
+                modalLoading.style.display = 'none';
+                modalImage.style.display = 'block';
+                if (title || description) {
+                    modalInfo.style.display = 'block';
+                }
+            };
+            img.onerror = function() {
+                modalLoading.style.display = 'none';
+                modalImage.style.display = 'block';
+                modalImage.src = src; // Try to show anyway
+            };
+            img.src = src;
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            // Clear modal content
+            setTimeout(() => {
+                modalImage.src = '';
+                modalTitle.textContent = '';
+                modalDescription.textContent = '';
+            }, 300);
+        }
+
+        // Close modal when clicking outside the image
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        // Prevent right-click context menu on images (optional)
+        document.querySelectorAll('.portfolio-image').forEach(img => {
+            img.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+        });
+    </script>
 </body>
 </html>
 
