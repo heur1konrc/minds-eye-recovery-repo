@@ -14,12 +14,11 @@ import ContactPage from './pages/ContactPage'
 import CopyrightProtection from './components/CopyrightProtection'
 import './App.css'
 
-// Portfolio redirect component
+// Portfolio redirect component - instant redirect
 const PortfolioRedirect = () => {
-  React.useEffect(() => {
-    window.location.href = '/portfolio';
-  }, []);
-  return <div>Redirecting to portfolio...</div>;
+  // Immediate redirect - no delay
+  window.location.replace('/portfolio');
+  return null; // Don't render anything
 };
 
 function App() {
