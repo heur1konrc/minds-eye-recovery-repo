@@ -102,9 +102,12 @@ const AboutMindsEye = () => {
           {/* MAIN CONTENT */}
           <div className="text-slate-300 text-lg leading-relaxed">
             {aboutData.content && aboutData.content.main_content && (
-              <div className="whitespace-pre-wrap">
-                {aboutData.content.main_content.split('\\r\\n').join('\n')}
-              </div>
+              <div 
+                className="prose prose-invert prose-lg max-w-none"
+                dangerouslySetInnerHTML={{ 
+                  __html: aboutData.content.main_content 
+                }}
+              />
             )}
             
             {/* SIGNATURE */}

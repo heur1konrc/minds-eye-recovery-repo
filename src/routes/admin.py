@@ -1314,6 +1314,7 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
 <html>
 <head>
     <title>About Page Management</title>
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     <style>
         body { 
             font-family: Arial, sans-serif; 
@@ -1400,6 +1401,15 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
             border: 2px solid #ff6b35;
             box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
         }
+        /* TinyMCE dark theme adjustments */
+        .tox .tox-editor-header {
+            background: #333 !important;
+            border-color: #555 !important;
+        }
+        .tox .tox-toolbar {
+            background: #333 !important;
+            border-color: #555 !important;
+        }
     </style>
 </head>
 <body>
@@ -1450,6 +1460,27 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
         
         <button type="submit" class="btn">Upload Image</button>
     </form>
+
+    <script>
+        tinymce.init({
+            selector: '#main_content',
+            height: 400,
+            skin: 'oxide-dark',
+            content_css: 'dark',
+            plugins: 'lists link image table code help wordcount',
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            menubar: false,
+            branding: false,
+            resize: true,
+            statusbar: true,
+            content_style: 'body { font-family: Arial, sans-serif; font-size: 14px; color: #fff; background-color: #333; }',
+            setup: function (editor) {
+                editor.on('change', function () {
+                    editor.save();
+                });
+            }
+        });
+    </script>
 </body>
 </html>
 '''
