@@ -1386,9 +1386,11 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
             color: #fff; 
         }
         .current-image { 
-            max-width: 300px; 
+            max-width: 400px; 
             border-radius: 5px; 
             margin-top: 10px; 
+            border: 2px solid #ff6b35;
+            box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
         }
     </style>
 </head>

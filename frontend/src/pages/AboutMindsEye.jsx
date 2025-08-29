@@ -86,12 +86,17 @@ const AboutMindsEye = () => {
         <div className="bg-slate-800 rounded-lg p-8">
           {/* IMAGE FLOATED LEFT WITH TEXT WRAPPED */}
           {aboutData.image && (
-            <img 
-              src={`/data/${aboutData.image}`} 
-              alt="About Mind's Eye Photography"
-              className="float-left mr-6 mb-4 w-80 h-auto rounded-lg shadow-lg cursor-pointer"
-              onClick={openFullscreen}
-            />
+            <div className="float-left mr-6 mb-4">
+              <img 
+                src={`/data/${aboutData.image}`} 
+                alt="About Mind's Eye Photography"
+                className="w-100 h-auto rounded-lg shadow-lg cursor-pointer"
+                onClick={openFullscreen}
+              />
+              <p className="text-slate-400 text-sm mt-2 text-center italic">
+                Click to view full screen image
+              </p>
+            </div>
           )}
           
           {/* MAIN CONTENT */}
