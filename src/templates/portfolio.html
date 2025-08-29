@@ -199,6 +199,67 @@
                 <p class="text-gray-500 mt-2">Please add images through the admin panel</p>
             </div>
             {% endif %}
+
+            <!-- Pagination Controls -->
+            {% if pagination and pagination.pages > 1 %}
+            <div class="flex justify-center items-center mt-12 space-x-2">
+                <!-- First Page -->
+                {% if pagination.page > 1 %}
+                <a href="{{ url_for('portfolio', page=1) }}" 
+                   class="px-3 py-2 bg-slate-800 text-white rounded hover:bg-orange-500 transition-colors">
+                    &laquo;&laquo;
+                </a>
+                {% endif %}
+
+                <!-- Previous Page -->
+                {% if pagination.has_prev %}
+                <a href="{{ url_for('portfolio', page=pagination.prev_num) }}" 
+                   class="px-3 py-2 bg-slate-800 text-white rounded hover:bg-orange-500 transition-colors">
+                    &laquo;
+                </a>
+                {% endif %}
+
+                <!-- Page Numbers -->
+                {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                    {% if page_num %}
+                        {% if page_num != pagination.page %}
+                        <a href="{{ url_for('portfolio', page=page_num) }}" 
+                           class="px-3 py-2 bg-slate-800 text-white rounded hover:bg-orange-500 transition-colors">
+                            {{ page_num }}
+                        </a>
+                        {% else %}
+                        <span class="px-3 py-2 bg-orange-500 text-white rounded font-bold">
+                            {{ page_num }}
+                        </span>
+                        {% endif %}
+                    {% else %}
+                    <span class="px-3 py-2 text-gray-500">…</span>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Next Page -->
+                {% if pagination.has_next %}
+                <a href="{{ url_for('portfolio', page=pagination.next_num) }}" 
+                   class="px-3 py-2 bg-slate-800 text-white rounded hover:bg-orange-500 transition-colors">
+                    &raquo;
+                </a>
+                {% endif %}
+
+                <!-- Last Page -->
+                {% if pagination.page < pagination.pages %}
+                <a href="{{ url_for('portfolio', page=pagination.pages) }}" 
+                   class="px-3 py-2 bg-slate-800 text-white rounded hover:bg-orange-500 transition-colors">
+                    &raquo;&raquo;
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Page Info -->
+            <div class="text-center mt-4 text-gray-400">
+                <p>Page {{ pagination.page }} of {{ pagination.pages }} 
+                   ({{ pagination.total }} total images)</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 

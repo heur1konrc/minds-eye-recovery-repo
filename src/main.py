@@ -1212,6 +1212,49 @@ def set_about_image_direct(filename):
         return f"Error: {str(e)}"
 
 
+@app.route('/portfolio')
+def portfolio():
+    """Portfolio page with pagination"""
+    try:
+        from flask import render_template, request
+        
+        # Get page number from query parameter, default to 1
+        page = request.args.get('page', 1, type=int)
+        per_page = 12  # 12 images per page
+        
+        # Get all portfolio images (excluding About images)
+        images_query = Image.query.filter(Image.is_about != True)
+        
+        # Paginate the results
+        images_paginated = images_query.paginate(
+            page=page, 
+            per_page=per_page, 
+            error_out=False
+        )
+        
+        # Get the images for current page
+        images = images_paginated.items
+        
+        # Create image data for template
+        image_data = []
+        for image in images:
+            image_data.append({
+                'filename': image.filename,
+                'title': image.title or f"Image {image.id}",
+                'description': image.description or ""
+            })
+        
+        return render_template('portfolio.html', 
+                             images=image_data,
+                             image_count=images_paginated.total,
+                             pagination=images_paginated,
+                             current_page=page)
+        
+    except Exception as e:
+        print(f"Error loading portfolio page: {e}")
+        return f"Error loading portfolio: {str(e)}", 500
+
+
 @app.route('/about-minds-eye')
 def about_minds_eye_page():
     """Serve the about-minds-eye page"""
