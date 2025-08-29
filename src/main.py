@@ -1214,16 +1214,29 @@ def set_about_image_direct(filename):
 
 @app.route('/portfolio')
 def portfolio():
-    """Portfolio page with pagination"""
+    """Portfolio page with pagination and category filtering"""
     try:
         from flask import render_template, request
         
-        # Get page number from query parameter, default to 1
+        # Get page number and category filter from query parameters
         page = request.args.get('page', 1, type=int)
+        category_filter = request.args.get('category', 'All')
         per_page = 12  # 12 images per page
         
-        # Get all portfolio images (excluding About images)
+        # Get all portfolio images (excluding About/Info images)
         images_query = Image.query.filter(Image.is_about != True)
+        
+        # Apply category filter if not "All"
+        if category_filter != 'All':
+            images_query = images_query.join(ImageCategory).join(Category).filter(
+                Category.name == category_filter
+            )
+        
+        # Get dynamic categories (only categories that have images, excluding Info)
+        categories_with_images = db.session.query(Category).join(ImageCategory).join(Image).filter(
+            Image.is_about != True,
+            Category.name != 'Info'  # Exclude Info category
+        ).distinct().order_by(Category.display_order).all()
         
         # Paginate the results
         images_paginated = images_query.paginate(
@@ -1246,6 +1259,8 @@ def portfolio():
         
         return render_template('portfolio.html', 
                              images=image_data,
+                             categories=categories_with_images,
+                             current_category=category_filter,
                              image_count=images_paginated.total,
                              pagination=images_paginated,
                              current_page=page)
