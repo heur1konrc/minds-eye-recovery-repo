@@ -22,7 +22,7 @@ function App() {
         <Navigation />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/portfolio" element={<DirectPortfolio />} />
+          {/* <Route path="/portfolio" element={<DirectPortfolio />} /> */}
           <Route path="/simple" element={<SimplePortfolio />} />
           <Route path="/working" element={<WorkingPortfolio />} />
           <Route path="/sql" element={<SQLPortfolio />} />
