@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Navigation from './components/Navigation'
 import HomePage from './pages/HomePage'
@@ -14,6 +14,14 @@ import ContactPage from './pages/ContactPage'
 import CopyrightProtection from './components/CopyrightProtection'
 import './App.css'
 
+// Portfolio redirect component
+const PortfolioRedirect = () => {
+  React.useEffect(() => {
+    window.location.href = '/portfolio';
+  }, []);
+  return <div>Redirecting to portfolio...</div>;
+};
+
 function App() {
   return (
     <Router>
@@ -22,7 +30,7 @@ function App() {
         <Navigation />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          {/* <Route path="/portfolio" element={<DirectPortfolio />} /> */}
+          <Route path="/portfolio" element={<PortfolioRedirect />} />
           <Route path="/simple" element={<SimplePortfolio />} />
           <Route path="/working" element={<WorkingPortfolio />} />
           <Route path="/sql" element={<SQLPortfolio />} />
