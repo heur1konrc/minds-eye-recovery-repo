@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const AboutMindsEye = () => {
+  console.log('AboutMindsEye component is rendering!');
   const [aboutData, setAboutData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showFullscreen, setShowFullscreen] = useState(false);
