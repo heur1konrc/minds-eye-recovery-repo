@@ -18,9 +18,9 @@ function removeAboutAndAddInfo() {
   
   // Add Info button to desktop navigation (after Featured)
   const desktopNav = document.querySelector('nav .hidden.md\\:flex');
-  if (desktopNav && !document.querySelector('a[href="/about-minds-eye"]')) {
+  if (desktopNav && !document.querySelector('a[href="/info"]')) {
     const infoLink = document.createElement('a');
-    infoLink.href = '/about-minds-eye';
+    infoLink.href = '/info';
     infoLink.textContent = 'Info';
     infoLink.className = 'text-white hover:text-orange-400 transition-colors';
     
@@ -35,10 +35,10 @@ function removeAboutAndAddInfo() {
   
   // Add Info button to mobile navigation
   const mobileNav = document.querySelector('.flex-1.py-6');
-  if (mobileNav && !document.querySelector('a[href="/about-minds-eye"]')) {
+  if (mobileNav && !document.querySelector('a[href="/info"]')) {
     const infoDiv = document.createElement('div');
     const infoLink = document.createElement('a');
-    infoLink.href = '/about-minds-eye';
+    infoLink.href = '/info';
     infoLink.textContent = 'Info';
     infoLink.className = 'block px-6 py-4 text-lg transition-colors border-l-4 text-white border-transparent hover:text-orange-400 hover:border-orange-500/50 hover:bg-slate-800/30';
     infoDiv.appendChild(infoLink);
@@ -50,7 +50,7 @@ function removeAboutAndAddInfo() {
     }
   }
   
-  console.log('About button removed, Info button added');
+  console.log('About button removed, Info button added (React route)');
 }
 
 // Run immediately and repeatedly
