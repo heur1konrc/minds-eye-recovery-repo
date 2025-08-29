@@ -1314,7 +1314,8 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
 <html>
 <head>
     <title>About Page Management</title>
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <style>
         body { 
             font-family: Arial, sans-serif; 
@@ -1401,14 +1402,30 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
             border: 2px solid #ff6b35;
             box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
         }
-        /* TinyMCE dark theme adjustments */
-        .tox .tox-editor-header {
-            background: #333 !important;
-            border-color: #555 !important;
+        /* Quill editor dark theme */
+        #editor-container {
+            height: 300px;
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 5px;
         }
-        .tox .tox-toolbar {
+        .ql-toolbar {
+            background: #444 !important;
+            border-color: #555 !important;
+            border-radius: 5px 5px 0 0;
+        }
+        .ql-container {
             background: #333 !important;
             border-color: #555 !important;
+            color: #fff !important;
+            border-radius: 0 0 5px 5px;
+        }
+        .ql-editor {
+            color: #fff !important;
+        }
+        #main_content {
+            display: none;
         }
     </style>
 </head>
@@ -1431,6 +1448,7 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
     <form method="POST" action="/admin/update-about-content">
         <div class="form-group">
             <label for="main_content">Main Content:</label>
+            <div id="editor-container"></div>
             <textarea name="main_content" id="main_content" required>{{ about_content.main_content }}</textarea>
         </div>
         
@@ -1462,23 +1480,34 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
     </form>
 
     <script>
-        tinymce.init({
-            selector: '#main_content',
-            height: 400,
-            skin: 'oxide-dark',
-            content_css: 'dark',
-            plugins: 'lists link image table code help wordcount',
-            toolbar: 'undo redo | blocks | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-            menubar: false,
-            branding: false,
-            resize: true,
-            statusbar: true,
-            content_style: 'body { font-family: Arial, sans-serif; font-size: 14px; color: #fff; background-color: #333; }',
-            setup: function (editor) {
-                editor.on('change', function () {
-                    editor.save();
-                });
+        // Initialize Quill editor
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'align': [] }],
+                    ['clean']
+                ]
             }
+        });
+
+        // Set initial content from textarea
+        var initialContent = document.getElementById('main_content').value;
+        if (initialContent) {
+            quill.root.innerHTML = initialContent;
+        }
+
+        // Update textarea when form is submitted
+        document.querySelector('form').addEventListener('submit', function() {
+            document.getElementById('main_content').value = quill.root.innerHTML;
+        });
+
+        // Update textarea on content change
+        quill.on('text-change', function() {
+            document.getElementById('main_content').value = quill.root.innerHTML;
         });
     </script>
 </body>
