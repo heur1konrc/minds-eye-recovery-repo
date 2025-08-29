@@ -1314,8 +1314,6 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
 <html>
 <head>
     <title>About Page Management</title>
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <style>
         body { 
             font-family: Arial, sans-serif; 
@@ -1402,30 +1400,58 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
             border: 2px solid #ff6b35;
             box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
         }
-        /* Quill editor dark theme */
-        #editor-container {
-            height: 300px;
-            background: #333;
-            color: #fff;
+        
+        /* Rich Text Editor Styles */
+        .editor-toolbar {
+            background: #444;
             border: 1px solid #555;
-            border-radius: 5px;
-        }
-        .ql-toolbar {
-            background: #444 !important;
-            border-color: #555 !important;
+            border-bottom: none;
+            padding: 8px;
             border-radius: 5px 5px 0 0;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
         }
-        .ql-container {
-            background: #333 !important;
-            border-color: #555 !important;
-            color: #fff !important;
+        .editor-btn {
+            background: #555;
+            color: #fff;
+            border: 1px solid #666;
+            padding: 6px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            min-width: 30px;
+            text-align: center;
+        }
+        .editor-btn:hover {
+            background: #666;
+        }
+        .editor-btn.active {
+            background: #ff6b35;
+            border-color: #ff6b35;
+        }
+        .editor-content {
+            background: #333;
+            border: 1px solid #555;
             border-radius: 0 0 5px 5px;
+            padding: 15px;
+            min-height: 300px;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            outline: none;
         }
-        .ql-editor {
-            color: #fff !important;
+        .editor-content:focus {
+            border-color: #ff6b35;
         }
         #main_content {
             display: none;
+        }
+        .editor-separator {
+            width: 1px;
+            background: #666;
+            margin: 0 5px;
         }
     </style>
 </head>
@@ -1448,7 +1474,23 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
     <form method="POST" action="/admin/update-about-content">
         <div class="form-group">
             <label for="main_content">Main Content:</label>
-            <div id="editor-container"></div>
+            <div class="editor-toolbar">
+                <button type="button" class="editor-btn" onclick="formatText('bold')" title="Bold"><b>B</b></button>
+                <button type="button" class="editor-btn" onclick="formatText('italic')" title="Italic"><i>I</i></button>
+                <button type="button" class="editor-btn" onclick="formatText('underline')" title="Underline"><u>U</u></button>
+                <div class="editor-separator"></div>
+                <button type="button" class="editor-btn" onclick="formatHeading('h1')" title="Heading 1">H1</button>
+                <button type="button" class="editor-btn" onclick="formatHeading('h2')" title="Heading 2">H2</button>
+                <button type="button" class="editor-btn" onclick="formatHeading('h3')" title="Heading 3">H3</button>
+                <div class="editor-separator"></div>
+                <button type="button" class="editor-btn" onclick="formatText('insertUnorderedList')" title="Bullet List">• List</button>
+                <button type="button" class="editor-btn" onclick="formatText('insertOrderedList')" title="Numbered List">1. List</button>
+                <div class="editor-separator"></div>
+                <button type="button" class="editor-btn" onclick="formatText('justifyLeft')" title="Align Left">←</button>
+                <button type="button" class="editor-btn" onclick="formatText('justifyCenter')" title="Align Center">↔</button>
+                <button type="button" class="editor-btn" onclick="formatText('justifyRight')" title="Align Right">→</button>
+            </div>
+            <div id="editor-content" class="editor-content" contenteditable="true"></div>
             <textarea name="main_content" id="main_content" required>{{ about_content.main_content }}</textarea>
         </div>
         
@@ -1480,35 +1522,45 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
     </form>
 
     <script>
-        // Initialize Quill editor
-        var quill = new Quill('#editor-container', {
-            theme: 'snow',
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    [{ 'align': [] }],
-                    ['clean']
-                ]
-            }
-        });
-
-        // Set initial content from textarea
-        var initialContent = document.getElementById('main_content').value;
-        if (initialContent) {
-            quill.root.innerHTML = initialContent;
+        // Initialize the editor
+        const editor = document.getElementById('editor-content');
+        const textarea = document.getElementById('main_content');
+        
+        // Load initial content
+        editor.innerHTML = textarea.value || '';
+        
+        // Format text function
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            editor.focus();
+            updateTextarea();
         }
-
-        // Update textarea when form is submitted
-        document.querySelector('form').addEventListener('submit', function() {
-            document.getElementById('main_content').value = quill.root.innerHTML;
-        });
-
+        
+        // Format heading function
+        function formatHeading(tag) {
+            document.execCommand('formatBlock', false, tag);
+            editor.focus();
+            updateTextarea();
+        }
+        
+        // Update textarea with editor content
+        function updateTextarea() {
+            textarea.value = editor.innerHTML;
+        }
+        
         // Update textarea on content change
-        quill.on('text-change', function() {
-            document.getElementById('main_content').value = quill.root.innerHTML;
+        editor.addEventListener('input', updateTextarea);
+        editor.addEventListener('paste', function() {
+            setTimeout(updateTextarea, 10);
         });
+        
+        // Update textarea before form submission
+        document.querySelector('form').addEventListener('submit', function() {
+            updateTextarea();
+        });
+        
+        // Focus editor on load
+        editor.focus();
     </script>
 </body>
 </html>
