@@ -1430,7 +1430,7 @@ ABOUT_MANAGEMENT_TEMPLATE = '''
     {% if current_image %}
         <div>
             <p><strong>Current Image:</strong></p>
-            <img src="/assets/{{ current_image }}" alt="Current About Image" class="current-image">
+            <img src="/data/{{ current_image }}" alt="Current About Image" class="current-image">
         </div>
     {% endif %}
     
