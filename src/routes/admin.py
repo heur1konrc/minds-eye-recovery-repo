@@ -1176,26 +1176,34 @@ def upload_about_image():
         return redirect(url_for('admin.admin_login'))
     
     try:
+        print("🔍 DEBUG: Starting about image upload")
         if 'image' not in request.files:
+            print("🔍 DEBUG: No image in request.files")
             return redirect(url_for('admin.about_management') + '?message=No image file selected&message_type=error')
         
         file = request.files['image']
+        print(f"🔍 DEBUG: File received: {file.filename}")
         if file.filename == '':
+            print("🔍 DEBUG: Empty filename")
             return redirect(url_for('admin.about_management') + '?message=No image file selected&message_type=error')
         
         if file:
             # Generate unique filename
             filename = f"about-minds-eye-{uuid.uuid4().hex[:8]}.{file.filename.rsplit('.', 1)[1].lower()}"
             filepath = os.path.join(PHOTOGRAPHY_ASSETS_DIR, filename)
+            print(f"🔍 DEBUG: Saving to: {filepath}")
             
             # Save file
             file.save(filepath)
+            print(f"🔍 DEBUG: File saved successfully")
             
             # Replace the about-minds-eye image (like Featured Image does)
             set_about_minds_eye_image(filename)
+            print(f"🔍 DEBUG: Filename set in JSON: {filename}")
             
             return redirect(url_for('admin.about_management') + '?message=About image updated successfully!&message_type=success')
     except Exception as e:
+        print(f"🔍 DEBUG: Upload error: {str(e)}")
         return redirect(url_for('admin.about_management') + f'?message=Upload failed: {str(e)}&message_type=error')
 
 @admin_bp.route('/admin/delete-about-image', methods=['POST'])
