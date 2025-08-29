@@ -29,7 +29,6 @@ function App() {
           <Route path="/sql" element={<SQLPortfolio />} />
           <Route path="/featured" element={<FeaturedPage />} />
           <Route path="/info" element={<AboutMindsEye />} />
-          <Route path="/about-you" element={<AboutYou />} />
           <Route path="/contact" element={<ContactPage />} />
         </Routes>
       </div>
