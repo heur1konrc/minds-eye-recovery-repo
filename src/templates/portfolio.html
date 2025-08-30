@@ -423,6 +423,13 @@
                 modalTitle.textContent = title;
                 modalDescription.textContent = description;
                 
+                // Add right-click protection directly to modal image
+                modalImage.oncontextmenu = function(e) {
+                    alert('Copyright Mind\'s Eye Photography 2025\nUse contact form for license options');
+                    e.preventDefault();
+                    return false;
+                };
+                
                 // Hide loading, show image and info
                 modalLoading.style.display = 'none';
                 modalImage.style.display = 'block';
