@@ -28,13 +28,43 @@ const AboutMindsEye = () => {
       }
     };
 
+    // Right-click protection for images
+    const handleContextMenu = (e) => {
+      if (e.target.tagName === 'IMG') {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    const handleDragStart = (e) => {
+      if (e.target.tagName === 'IMG') {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    const handleSelectStart = (e) => {
+      if (e.target.tagName === 'IMG') {
+        e.preventDefault();
+        return false;
+      }
+    };
+
     if (showFullscreen) {
       document.addEventListener('keydown', handleEscape);
       document.body.style.overflow = 'hidden';
     }
 
+    // Add image protection event listeners
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('dragstart', handleDragStart);
+    document.addEventListener('selectstart', handleSelectStart);
+
     return () => {
       document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('dragstart', handleDragStart);
+      document.removeEventListener('selectstart', handleSelectStart);
       document.body.style.overflow = 'unset';
     };
   }, [showFullscreen]);
@@ -90,8 +120,21 @@ const AboutMindsEye = () => {
               <img 
                 src={`/data/${aboutData.image}`} 
                 alt="About Mind's Eye Photography"
-                className="w-120 h-auto rounded-lg shadow-lg cursor-pointer"
+                className="w-120 h-auto rounded-lg shadow-lg cursor-pointer select-none"
                 onClick={openFullscreen}
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
+                style={{
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  MozUserSelect: 'none',
+                  msUserSelect: 'none',
+                  userDrag: 'none',
+                  WebkitUserDrag: 'none',
+                  KhtmlUserDrag: 'none',
+                  MozUserDrag: 'none',
+                  OUserDrag: 'none'
+                }}
               />
               <p className="text-slate-400 text-sm mt-2 text-center italic">
                 Click to view full screen image
@@ -123,20 +166,33 @@ const AboutMindsEye = () => {
         </div>
       </div>
 
-      {/* FULLSCREEN MODAL */}
+      {/* FIT-TO-SCREEN MODAL */}
       {showFullscreen && aboutData.image && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
-          <div className="relative max-w-full max-h-full p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">
+          <div className="relative w-full h-full max-w-6xl max-h-4xl flex items-center justify-center">
             <button
               onClick={closeFullscreen}
-              className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300 z-10"
+              className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center"
             >
               ×
             </button>
             <img
               src={`/data/${aboutData.image}`}
-              alt="About Mind's Eye Photography - Fullscreen"
-              className="max-w-full max-h-full object-contain"
+              alt="About Mind's Eye Photography - Fit to Screen"
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl select-none"
+              onContextMenu={(e) => e.preventDefault()}
+              onDragStart={(e) => e.preventDefault()}
+              style={{
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
+                msUserSelect: 'none',
+                userDrag: 'none',
+                WebkitUserDrag: 'none',
+                KhtmlUserDrag: 'none',
+                MozUserDrag: 'none',
+                OUserDrag: 'none'
+              }}
             />
           </div>
         </div>
