@@ -367,10 +367,9 @@
             // Disable right-click context menu on all images
             document.addEventListener('contextmenu', function(e) {
                 if (e.target.tagName === 'IMG') {
-                    // Check if this is the modal image
+                    // Skip modal image - it has its own handler
                     if (e.target.id === 'modalImage') {
-                        // Show dialogue for modal image - match standard protection message
-                        alert('Copyright Mind\'s Eye Photography 2025\nUse contact form for license options');
+                        return; // Let the direct handler deal with it
                     }
                     e.preventDefault();
                     return false;
