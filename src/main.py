@@ -440,7 +440,7 @@ def get_featured_image():
                                         # Handle decimal values like 0.001333333
                                         if isinstance(value, (int, float)) and value < 1:
                                             # Convert decimal to fraction (e.g., 0.00133 -> 1/750)
-                                            fraction_denominator = int(round(1 / value))
+                                            fraction_denominator = int(round(1.0 / value))
                                             exif_data['shutter_speed'] = f"1/{fraction_denominator}"
                                         else:
                                             exif_data['shutter_speed'] = f"{value}s"
