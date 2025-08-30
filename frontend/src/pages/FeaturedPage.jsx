@@ -194,28 +194,39 @@ const FeaturedPage = () => {
         )}
       </div>
 
-      {/* A. FULLSCREEN MODAL - CLEAN, ONLY X TO CLOSE */}
+      {/* FIT-TO-SCREEN MODAL - LIKE PORTFOLIO */}
       {showFullscreen && (
         <div 
-          className="fixed inset-0 bg-black z-50 flex items-center justify-center"
+          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
           onClick={closeFullscreen}
         >
-          {/* ONLY WHITE X TO CLOSE */}
+          {/* CLOSE BUTTON */}
           <button
             onClick={closeFullscreen}
-            className="absolute top-4 right-4 text-white text-4xl font-bold z-60 hover:text-orange-500 transition-colors"
-            aria-label="Close fullscreen"
+            className="absolute top-4 right-4 text-white text-4xl font-bold z-60 hover:text-orange-500 transition-colors bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center"
+            aria-label="Close modal"
           >
             ×
           </button>
           
-          {/* CLEAN IMAGE - NO TEXT */}
-          <img
-            src={`/data/${featuredImage.filename}`}
-            alt={featuredImage.title || 'Featured Image'}
-            className="max-w-full max-h-full object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
+          {/* FIT-TO-SCREEN IMAGE WITH TITLE */}
+          <div className="max-w-6xl max-h-[90vh] flex flex-col items-center">
+            <img
+              src={`/data/${featuredImage.filename}`}
+              alt={featuredImage.title || 'Featured Image'}
+              className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+            {/* IMAGE TITLE BELOW */}
+            {featuredImage.title && (
+              <div className="mt-4 text-center">
+                <h3 className="text-2xl font-bold text-orange-500">{featuredImage.title}</h3>
+                {featuredImage.description && (
+                  <p className="text-slate-300 mt-2">{featuredImage.description}</p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
