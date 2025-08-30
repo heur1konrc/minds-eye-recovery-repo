@@ -110,6 +110,16 @@
             }
         }
         
+        /* Modal active state - CRITICAL for modal to show */
+        .modal.active {
+            display: flex !important;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal.active .modal-image {
+            animation: scaleIn 0.3s ease;
+        }
+        
         /* Cursor pointer for clickable images */
         .portfolio-image {
             cursor: pointer;
