@@ -433,7 +433,7 @@ def get_featured_image():
                                 elif tag == 'ExposureTime':
                                     if isinstance(value, tuple) and len(value) == 2:
                                         if value[0] < value[1]:
-                                            exif_data['shutter_speed'] = f"1/{int(value[1]/value[0])}"
+                                            exif_data['shutter_speed'] = f"{value[0]}/{value[1]}"
                                         else:
                                             exif_data['shutter_speed'] = f"{value[0]/value[1]:.2f}s"
                                     else:
