@@ -431,24 +431,25 @@ def get_featured_image():
                                     else:
                                         exif_data['aperture'] = f"f/{value}"
                                 elif tag == 'ExposureTime':
-                                    # DEBUG: Print the actual value and type
-                                    print(f"DEBUG ExposureTime: value={value}, type={type(value)}")
+                                    # Convert IFDRational to float for proper calculation
+                                    if hasattr(value, '__float__'):
+                                        value = float(value)
                                     
                                     if isinstance(value, tuple) and len(value) == 2:
-                                        print(f"DEBUG: Tuple format - value[0]={value[0]}, value[1]={value[1]}")
                                         if value[0] < value[1]:
                                             exif_data['shutter_speed'] = f"{value[0]}/{value[1]}"
                                         else:
                                             exif_data['shutter_speed'] = f"{value[0]/value[1]:.2f}s"
                                     else:
-                                        print(f"DEBUG: Non-tuple format - value={value}")
-                                        # Handle decimal values like 0.001333333
-                                        if isinstance(value, (int, float)) and value < 1:
-                                            # Convert decimal to fraction (e.g., 0.00133 -> 1/750)
-                                            fraction_denominator = int(round(1.0 / value))
-                                            exif_data['shutter_speed'] = f"1/{fraction_denominator}"
+                                        # Handle decimal values like 0.0005
+                                        if isinstance(value, (int, float)) and 0 < value < 1:
+                                            # Convert decimal to fraction (e.g., 0.0005 -> 1/2000)
+                                            denominator = int(round(1.0 / value))
+                                            exif_data['shutter_speed'] = f"1/{denominator}"
+                                        elif isinstance(value, (int, float)) and value >= 1:
+                                            exif_data['shutter_speed'] = f"{value:.1f}s"
                                         else:
-                                            exif_data['shutter_speed'] = f"{value}s"
+                                            exif_data['shutter_speed'] = str(value)
                                 elif tag == 'ISOSpeedRatings':
                                     exif_data['iso'] = f"ISO {value}"
                                 elif tag == 'Flash':
