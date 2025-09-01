@@ -29,7 +29,7 @@ function App() {
         <Navigation />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/portfolio" element={<PortfolioRedirect />} />
+          <Route path="/portfolio" element={<SQLPortfolio />} />
           <Route path="/simple" element={<SimplePortfolio />} />
           <Route path="/working" element={<WorkingPortfolio />} />
           <Route path="/sql" element={<SQLPortfolio />} />
