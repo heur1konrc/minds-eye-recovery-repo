@@ -7,14 +7,54 @@ const SQLPortfolio = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const imagesPerPage = 12;
 
+  // Initialize from URL parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryParam = urlParams.get('category');
+    const pageParam = urlParams.get('page');
+    
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+    }
+    if (pageParam) {
+      setCurrentPage(parseInt(pageParam) || 1);
+    }
+  }, []);
+
+  // Update URL when category or page changes
+  const updateURL = (category, page) => {
+    const url = new URL(window.location);
+    if (category && category !== 'All') {
+      url.searchParams.set('category', category);
+    } else {
+      url.searchParams.delete('category');
+    }
+    if (page && page > 1) {
+      url.searchParams.set('page', page);
+    } else {
+      url.searchParams.delete('page');
+    }
+    window.history.pushState({}, '', url);
+  };
+
   useEffect(() => {
     fetchImages();
   }, []);
 
-  // Reset pagination when category changes
+  // Reset pagination when category changes and update URL
   useEffect(() => {
-    setCurrentPage(1);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+      updateURL(selectedCategory, 1);
+    } else {
+      updateURL(selectedCategory, currentPage);
+    }
   }, [selectedCategory]);
+
+  // Update URL when page changes
+  useEffect(() => {
+    updateURL(selectedCategory, currentPage);
+  }, [currentPage]);
 
   const fetchImages = async () => {
     try {
