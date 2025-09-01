@@ -275,17 +275,26 @@ const SQLPortfolio = () => {
               <div className="flex gap-2">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
                   const url = new URL(window.location.origin + '/portfolio');
+                  
+                  // Debug logging
+                  console.log('Generating URL for page', page, 'with category:', selectedCategory);
+                  
                   if (selectedCategory && selectedCategory !== 'All') {
                     url.searchParams.set('category', selectedCategory);
+                    console.log('Added category to URL:', selectedCategory);
                   }
                   if (page > 1) {
                     url.searchParams.set('page', page);
+                    console.log('Added page to URL:', page);
                   }
+                  
+                  const finalUrl = url.pathname + url.search;
+                  console.log('Final URL:', finalUrl);
                   
                   return (
                     <a
                       key={page}
-                      href={url.pathname + url.search}
+                      href={finalUrl}
                       onClick={(e) => {
                         e.preventDefault();
                         setCurrentPage(page);
