@@ -74,7 +74,7 @@ def get_portfolio_debug():
             'status': 'error'
         }), 500
 
-@user_bp.route('/portfolio', methods=['GET'])
+@user_bp.route('/api/portfolio-data', methods=['GET'])
 def get_portfolio():
     """API endpoint to get portfolio data from SQL database"""
     try:
