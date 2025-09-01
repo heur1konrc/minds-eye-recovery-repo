@@ -23,7 +23,6 @@ class Image(db.Model):
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
     upload_date = db.Column(db.DateTime, default=datetime.utcnow)
-    capture_date = db.Column(db.DateTime)  # Date photo was taken (from EXIF)
     file_size = db.Column(db.Integer)
     width = db.Column(db.Integer)
     height = db.Column(db.Integer)

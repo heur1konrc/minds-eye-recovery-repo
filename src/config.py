@@ -34,8 +34,8 @@ FEATURED_DATA_FILE = os.path.join(STATIC_DIR, 'assets', 'featured-image.json')
 LEGACY_ASSETS_DIR = os.path.join(STATIC_DIR, 'assets')
 
 # URL paths for serving images
-PHOTOGRAPHY_ASSETS_URL_PREFIX = '/static/assets/'
-LEGACY_ASSETS_URL_PREFIX = '/static/assets/'
+PHOTOGRAPHY_ASSETS_URL_PREFIX = '/data/'
+LEGACY_ASSETS_URL_PREFIX = '/data/'
 
 def get_image_url(filename):
     """
