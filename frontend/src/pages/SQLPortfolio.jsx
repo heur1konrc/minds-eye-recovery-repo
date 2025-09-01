@@ -273,20 +273,33 @@ const SQLPortfolio = () => {
               </button>
               
               <div className="flex gap-2">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`w-10 h-10 rounded-lg font-medium transition-all ${
-                      currentPage === page
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
-              </div>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                  const url = new URL(window.location.origin + '/portfolio');
+                  if (selectedCategory && selectedCategory !== 'All') {
+                    url.searchParams.set('category', selectedCategory);
+                  }
+                  if (page > 1) {
+                    url.searchParams.set('page', page);
+                  }
+                  
+                  return (
+                    <a
+                      key={page}
+                      href={url.pathname + url.search}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage(page);
+                      }}
+                      className={`w-10 h-10 rounded-lg font-medium transition-all flex items-center justify-center ${
+                        currentPage === page
+                          ? 'bg-orange-500 text-white'
+                          : 'bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white'
+                      }`}
+                    >
+                      {page}
+                    </a>
+                  );
+                })}</div>
               
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
