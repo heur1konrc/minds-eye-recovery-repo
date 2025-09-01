@@ -1229,8 +1229,8 @@ def portfolio():
         category_filter = request.args.get('category', 'All')
         per_page = 12  # 12 images per page
         
-        # Get all portfolio images (excluding About/Info images)
-        images_query = Image.query.filter(Image.is_about != True)
+        # Get all portfolio images (excluding About/Info images) - sorted by date taken (newest first)
+        images_query = Image.query.filter(Image.is_about != True).order_by(Image.upload_date.desc())
         
         # Apply category filter if not "All"
         if category_filter != 'All':
