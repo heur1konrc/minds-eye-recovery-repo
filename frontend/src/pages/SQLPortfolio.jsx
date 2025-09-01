@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 const SQLPortfolio = () => {
   const [images, setImages] = useState([]);
@@ -104,9 +104,16 @@ const SQLPortfolio = () => {
   }
 
   const categories = getCategories();
-  const currentImages = getCurrentPageImages();
-  const totalPages = getTotalPages();
-  const filteredCount = getFilteredImages().length;
+  
+  // Use useMemo to ensure proper recalculation when dependencies change
+  const filteredImages = useMemo(() => getFilteredImages(), [images, selectedCategory]);
+  const currentImages = useMemo(() => {
+    const startIndex = (currentPage - 1) * imagesPerPage;
+    const endIndex = startIndex + imagesPerPage;
+    return filteredImages.slice(startIndex, endIndex);
+  }, [filteredImages, currentPage, imagesPerPage]);
+  const totalPages = useMemo(() => Math.ceil(filteredImages.length / imagesPerPage), [filteredImages.length, imagesPerPage]);
+  const filteredCount = filteredImages.length;
 
   return (
     <div className="min-h-screen bg-slate-900 pt-20">
