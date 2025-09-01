@@ -11,6 +11,11 @@ const SQLPortfolio = () => {
     fetchImages();
   }, []);
 
+  // Reset pagination when category changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory]);
+
   const fetchImages = async () => {
     try {
       console.log('🔍 Fetching images from /api/simple-portfolio...');
