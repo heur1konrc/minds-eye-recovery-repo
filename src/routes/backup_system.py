@@ -278,7 +278,10 @@ def create_manual_backup():
             # 6. Create TAR.GZ file with custom name
             tar_path = os.path.join(temp_dir, custom_name)
             with tarfile.open(tar_path, 'w:gz') as tar:
-                tar.add(backup_dir, arcname=backup_name)
+                # Add each item in backup_dir individually to avoid path issues
+                for item in os.listdir(backup_dir):
+                    item_path = os.path.join(backup_dir, item)
+                    tar.add(item_path, arcname=item)
             
             # Return the TAR.GZ file for download with custom name
             return send_file(tar_path, 
