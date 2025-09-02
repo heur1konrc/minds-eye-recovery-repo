@@ -50,7 +50,10 @@ def emergency_backup_download():
             # 4. Create TAR.GZ file
             tar_path = os.path.join(temp_dir, f"{backup_name}.tar.gz")
             with tarfile.open(tar_path, 'w:gz') as tar:
-                tar.add(backup_dir, arcname=backup_name)
+                # Add each item in backup_dir individually to avoid path issues
+                for item in os.listdir(backup_dir):
+                    item_path = os.path.join(backup_dir, item)
+                    tar.add(item_path, arcname=item)
             
             # Return the TAR.GZ file for download
             return send_file(tar_path, 
