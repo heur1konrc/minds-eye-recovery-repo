@@ -29,7 +29,28 @@ def simple_backup_download():
         if os.path.exists(db_source):
             shutil.copy2(db_source, backup_dir)
         
-        # Copy all image files
+        # Copy ALL SOURCE CODE - This is the most important part!
+        source_dirs = [
+            "/app/src",           # Main source code
+            "/app/frontend",      # Frontend React code  
+            "/app/requirements.txt",  # Dependencies
+            "/app/package.json",      # Node dependencies
+        ]
+        
+        source_file_count = 0
+        for source_item in source_dirs:
+            if os.path.exists(source_item):
+                if os.path.isfile(source_item):
+                    # Copy individual file
+                    shutil.copy2(source_item, backup_dir)
+                    source_file_count += 1
+                elif os.path.isdir(source_item):
+                    # Copy entire directory
+                    dest_dir = os.path.join(backup_dir, os.path.basename(source_item))
+                    shutil.copytree(source_item, dest_dir)
+                    source_file_count += len([f for f in os.listdir(dest_dir) if os.path.isfile(os.path.join(dest_dir, f))])
+        
+        # Copy all image files (secondary priority)
         data_dir = "/data"
         image_count = 0
         if os.path.exists(data_dir):
@@ -43,6 +64,7 @@ def simple_backup_download():
         # Create backup info
         info_content = f"""WORKING BACKUP CREATED: {datetime.now()}
 Database: {'✅ Included' if os.path.exists(db_source) else '❌ Not found'}
+Source Code Files: {source_file_count} files
 Images: {image_count} files
 """
         with open(os.path.join(backup_dir, "backup_info.txt"), 'w') as f:
