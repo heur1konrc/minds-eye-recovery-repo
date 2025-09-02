@@ -20,6 +20,7 @@ from src.routes.portfolio_management import portfolio_mgmt_bp
 from src.routes.category_management import category_mgmt_bp
 from src.routes.debug_migration import debug_migration_bp
 from src.routes.backup_system import backup_system_bp
+from src.routes.simple_backup_route import simple_backup_bp
 from src.routes.og_image import og_bp
 from src.routes.cleanup_api import cleanup_bp
 from src.routes.slideshow_api import slideshow_api_bp  # Simple slideshow API (Option 1)
@@ -48,6 +49,7 @@ app.register_blueprint(featured_bp)
 app.register_blueprint(category_mgmt_bp)
 app.register_blueprint(debug_migration_bp)
 app.register_blueprint(backup_system_bp)
+app.register_blueprint(simple_backup_bp)
 app.register_blueprint(og_bp)
 app.register_blueprint(cleanup_bp)
 
