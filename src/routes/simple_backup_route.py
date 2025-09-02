@@ -24,48 +24,35 @@ def simple_backup_download():
         backup_dir = os.path.join(temp_dir, backup_name)
         os.makedirs(backup_dir)
         
+        # Copy ALL SOURCE CODE - COMPLETE BACKUP
+        import subprocess
+        
+        # Get the entire project directory
+        project_root = "/app"
+        if os.path.exists(project_root):
+            # Copy entire project except node_modules and other large dirs
+            for item in os.listdir(project_root):
+                if item not in ['node_modules', '.git', '__pycache__', '.next', 'dist', 'build']:
+                    source_path = os.path.join(project_root, item)
+                    dest_path = os.path.join(backup_dir, item)
+                    
+                    if os.path.isdir(source_path):
+                        shutil.copytree(source_path, dest_path, ignore=shutil.ignore_patterns('__pycache__', '*.pyc', 'node_modules'))
+                    else:
+                        shutil.copy2(source_path, dest_path)
+        
+        source_file_count = sum([len(files) for r, d, files in os.walk(backup_dir)])
+        
         # Copy database file
         db_source = "/data/mindseye.db"
         if os.path.exists(db_source):
             shutil.copy2(db_source, backup_dir)
         
-        # Copy ALL SOURCE CODE - This is the most important part!
-        source_dirs = [
-            "/app/src",           # Main source code
-            "/app/frontend",      # Frontend React code  
-            "/app/requirements.txt",  # Dependencies
-            "/app/package.json",      # Node dependencies
-        ]
-        
-        source_file_count = 0
-        for source_item in source_dirs:
-            if os.path.exists(source_item):
-                if os.path.isfile(source_item):
-                    # Copy individual file
-                    shutil.copy2(source_item, backup_dir)
-                    source_file_count += 1
-                elif os.path.isdir(source_item):
-                    # Copy entire directory
-                    dest_dir = os.path.join(backup_dir, os.path.basename(source_item))
-                    shutil.copytree(source_item, dest_dir)
-                    source_file_count += len([f for f in os.listdir(dest_dir) if os.path.isfile(os.path.join(dest_dir, f))])
-        
-        # Copy all image files (secondary priority)
-        data_dir = "/data"
-        image_count = 0
-        if os.path.exists(data_dir):
-            for file in os.listdir(data_dir):
-                if file.endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp')):
-                    source_path = os.path.join(data_dir, file)
-                    if os.path.isfile(source_path):
-                        shutil.copy2(source_path, backup_dir)
-                        image_count += 1
-        
         # Create backup info
-        info_content = f"""WORKING BACKUP CREATED: {datetime.now()}
+        info_content = f"""COMPLETE SOURCE CODE BACKUP: {datetime.now()}
 Database: {'✅ Included' if os.path.exists(db_source) else '❌ Not found'}
-Source Code Files: {source_file_count} files
-Images: {image_count} files
+Total Files: {source_file_count} files
+INCLUDES: Complete source code, frontend, backend, all files
 """
         with open(os.path.join(backup_dir, "backup_info.txt"), 'w') as f:
             f.write(info_content)
