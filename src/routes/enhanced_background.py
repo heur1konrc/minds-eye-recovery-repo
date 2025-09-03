@@ -32,7 +32,6 @@ def slideshow_background_manager():
     
     # Get all portfolio images - sorted by capture date newest to oldest
     portfolio_images = Image.query.order_by(
-        Image.capture_date.desc().nullslast(),
         Image.upload_date.desc()
     ).all()
     

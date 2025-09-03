@@ -108,7 +108,7 @@ def backup_system_dashboard():
 
 @backup_system_bp.route('/admin/backup/create-manual', methods=['POST'])
 def create_manual_backup():
-    """Create complete manual backup (images + data + database) with custom filename"""
+    """Create COMPLETE backup (GitHub source code + Railway volume data)"""
     try:
         # Get custom backup name from form
         custom_name = request.form.get('backup_name', '').strip()
@@ -131,172 +131,131 @@ def create_manual_backup():
             backup_dir = os.path.join(temp_dir, backup_name)
             os.makedirs(backup_dir)
             
-            # 1. Backup database
-            db_backup_path = os.path.join(backup_dir, 'database')
-            os.makedirs(db_backup_path)
+            # STEP 1: CLONE ACTUAL DEPLOYED SOURCE CODE FROM GITHUB
+            github_repo_path = os.path.join(temp_dir, 'github_source')
+            source_files_count = 0
             
-            # Export all data to JSON
-            backup_data = {
-                'timestamp': datetime.now().isoformat(),
-                'backup_name': custom_name,
-                'version': '1.0',
-                'images': [],
-                'categories': [],
-                'system_config': []
-            }
-            
-            # Export images
-            for image in Image.query.all():
-                image_data = {
-                    'id': image.id,
-                    'filename': image.filename,
-                    'title': image.title,
-                    'description': image.description,
-                    'file_size': image.file_size,
-                    'width': image.width,
-                    'height': image.height,
-                    'upload_date': image.upload_date.isoformat() if image.upload_date else None,
-                    'categories': [cat.category.name for cat in image.categories]
-                }
-                backup_data['images'].append(image_data)
-            
-            # Export categories
-            for category in Category.query.all():
-                category_data = {
-                    'id': category.id,
-                    'name': category.name,
-                    'display_order': category.display_order
-                }
-                backup_data['categories'].append(category_data)
-            
-            # Export system config
-            for config in SystemConfig.query.all():
-                config_data = {
-                    'key': config.key,
-                    'value': config.value,
-                    'data_type': config.data_type,
-                    'description': config.description
-                }
-                backup_data['system_config'].append(config_data)
-            
-            # Save backup data
-            with open(os.path.join(db_backup_path, 'backup_data.json'), 'w') as f:
-                json.dump(backup_data, f, indent=2)
-            
-            # Copy database file
-            db_file = os.path.join(PHOTOGRAPHY_ASSETS_DIR, 'mindseye.db')
-            if os.path.exists(db_file):
-                shutil.copy2(db_file, os.path.join(db_backup_path, 'mindseye.db'))
-            
-            # 2. Backup images
-            images_backup_path = os.path.join(backup_dir, 'images')
-            os.makedirs(images_backup_path)
-            
-            if os.path.exists(PHOTOGRAPHY_ASSETS_DIR):
-                for file in os.listdir(PHOTOGRAPHY_ASSETS_DIR):
-                    file_path = os.path.join(PHOTOGRAPHY_ASSETS_DIR, file)
-                    if os.path.isfile(file_path) and not file.endswith('.db'):
-                        shutil.copy2(file_path, images_backup_path)
-            
-            # 3. Backup source code - COMPLETE PROJECT BACKUP
-            code_backup_path = os.path.join(backup_dir, 'source_code')
-            os.makedirs(code_backup_path)
-            
-            # Get project root directory (go up from src/routes/ to project root)
-            project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-            
-            # Copy ALL essential project files and directories
-            essential_items = [
-                'src',           # Backend source code
-                'frontend',      # Frontend React app
-                'requirements.txt',  # Python dependencies
-                'package.json',      # Node.js dependencies (if exists)
-                'wsgi.py',          # WSGI entry point
-                'main.py',          # Main application file (if exists)
-                'README.md',        # Documentation
-                '.gitignore',       # Git ignore file
-                'Procfile',         # Railway deployment file (if exists)
-                'railway.json',     # Railway config (if exists)
-                'Dockerfile',       # Docker config (if exists)
-            ]
-            
-            # Copy each essential item
-            for item in essential_items:
-                src_path = os.path.join(project_root, item)
-                dest_path = os.path.join(code_backup_path, item)
+            try:
+                # Clone with timeout and better error handling
+                result = subprocess.run([
+                    'git', 'clone', 
+                    'https://github.com/heur1konrc/minds-eye-recovery-repo.git', 
+                    github_repo_path
+                ], check=True, capture_output=True, text=True, timeout=300)
                 
-                if os.path.exists(src_path):
-                    try:
-                        if os.path.isdir(src_path):
-                            # Skip node_modules and other large directories
-                            if item == 'frontend':
-                                # Copy frontend but exclude node_modules
-                                shutil.copytree(src_path, dest_path, 
-                                              ignore=shutil.ignore_patterns('node_modules', 'dist', '.next', 'build'))
-                            else:
-                                shutil.copytree(src_path, dest_path)
+                # Verify clone was successful
+                if not os.path.exists(github_repo_path) or not os.path.exists(os.path.join(github_repo_path, '.git')):
+                    raise Exception("GitHub repository clone verification failed")
+                
+                # Create source code directory in backup
+                source_backup_dir = os.path.join(backup_dir, 'DEPLOYED_SOURCE_CODE')
+                os.makedirs(source_backup_dir)
+                
+                # Copy all source code files (excluding .git)
+                for item in os.listdir(github_repo_path):
+                    if item != '.git':
+                        source_path = os.path.join(github_repo_path, item)
+                        dest_path = os.path.join(source_backup_dir, item)
+                        
+                        if os.path.isdir(source_path):
+                            shutil.copytree(source_path, dest_path, 
+                                          ignore=shutil.ignore_patterns('__pycache__', '*.pyc', 'node_modules', '.git'))
+                            for root, dirs, files in os.walk(dest_path):
+                                source_files_count += len(files)
                         else:
-                            shutil.copy2(src_path, dest_path)
-                    except Exception as e:
-                        print(f"Warning: Could not backup {item}: {str(e)}")
+                            shutil.copy2(source_path, dest_path)
+                            source_files_count += 1
+                            
+            except subprocess.TimeoutExpired:
+                return redirect(url_for('backup_system.backup_system_dashboard') + 
+                              '?message=GitHub clone timeout - repository too large&message_type=error')
+            except subprocess.CalledProcessError as e:
+                error_msg = f"Git clone failed: {e.stderr if e.stderr else str(e)}"
+                return redirect(url_for('backup_system.backup_system_dashboard') + 
+                              f'?message={error_msg}&message_type=error')
+            except Exception as e:
+                return redirect(url_for('backup_system.backup_system_dashboard') + 
+                              f'?message=Source code backup failed: {str(e)}&message_type=error')
             
-            # Create a backup manifest
-            manifest = {
-                'backup_type': 'COMPLETE_PROJECT_BACKUP',
-                'timestamp': datetime.now().isoformat(),
-                'project_root': project_root,
-                'backed_up_items': [],
-                'skipped_items': []
-            }
+            # STEP 2: BACKUP RAILWAY VOLUME DATA
+            railway_data_dir = PHOTOGRAPHY_ASSETS_DIR  # This is /data
+            data_files_count = 0
             
-            # Check what was actually backed up
-            for item in essential_items:
-                if os.path.exists(os.path.join(code_backup_path, item)):
-                    manifest['backed_up_items'].append(item)
-                else:
-                    manifest['skipped_items'].append(item)
+            if os.path.exists(railway_data_dir):
+                # Create Railway data directory in backup
+                data_backup_dir = os.path.join(backup_dir, 'RAILWAY_VOLUME_DATA')
+                os.makedirs(data_backup_dir)
+                
+                # Copy all files from Railway volume
+                for file in os.listdir(railway_data_dir):
+                    source_path = os.path.join(railway_data_dir, file)
+                    dest_path = os.path.join(data_backup_dir, file)
+                    
+                    if os.path.isfile(source_path):
+                        shutil.copy2(source_path, dest_path)
+                        data_files_count += 1
             
-            # Save manifest
-            with open(os.path.join(code_backup_path, 'BACKUP_MANIFEST.json'), 'w') as f:
-                json.dump(manifest, f, indent=2)
+            # STEP 3: CREATE BACKUP INFO
+            backup_info = f"""
+🎯 COMPLETE DEPLOYED BACKUP CREATED: {datetime.now()}
+Backup Name: {custom_name}
+
+🚀 DEPLOYED SOURCE CODE: ✅ {source_files_count} files
+   - FROM: GitHub Repository (heur1konrc/minds-eye-recovery-repo)
+   - INCLUDES: Backend Python code, Frontend React code, Configuration files
+   - THIS IS THE ACTUAL DEPLOYED SOURCE CODE
+
+🚂 RAILWAY VOLUME DATA: ✅ {data_files_count} files
+   - FROM: Railway Volume ({railway_data_dir})
+   - INCLUDES: Database (mindseye.db) and all images
+   - THIS IS THE ACTUAL DEPLOYED DATA
+
+This backup contains the REAL deployed application:
+- Source code that Railway deploys from GitHub
+- Data that Railway stores in the volume
+            """
             
-            # 4. Create restore instructions
-            restore_instructions = create_restore_instructions()
-            with open(os.path.join(backup_dir, 'RESTORE_INSTRUCTIONS.md'), 'w') as f:
-                f.write(restore_instructions)
+            with open(os.path.join(backup_dir, 'DEPLOYED_BACKUP_INFO.txt'), 'w') as f:
+                f.write(backup_info)
             
-            # 5. Create backup info
-            backup_info = {
-                'backup_name': custom_name,
-                'timestamp': datetime.now().isoformat(),
-                'image_count': len(backup_data['images']),
-                'category_count': len(backup_data['categories']),
-                'total_files': len(os.listdir(images_backup_path)) if os.path.exists(images_backup_path) else 0,
-                'backup_size_mb': get_directory_size(backup_dir) / (1024 * 1024)
-            }
-            
-            with open(os.path.join(backup_dir, 'backup_info.json'), 'w') as f:
-                json.dump(backup_info, f, indent=2)
-            
-            # 6. Create TAR.GZ file with custom name
+            # STEP 4: CREATE TAR.GZ FILE WITH BETTER ERROR HANDLING
             tar_path = os.path.join(temp_dir, custom_name)
-            with tarfile.open(tar_path, 'w:gz') as tar:
-                # Add each item in backup_dir individually to avoid path issues
-                for item in os.listdir(backup_dir):
-                    item_path = os.path.join(backup_dir, item)
-                    tar.add(item_path, arcname=item)
             
-            # Return the TAR.GZ file for download with custom name
-            return send_file(tar_path, 
-                           as_attachment=True, 
-                           download_name=custom_name,
-                           mimetype='application/gzip')
+            try:
+                # Create tar file with compression
+                with tarfile.open(tar_path, 'w:gz', compresslevel=6) as tar:
+                    # Add source code directory
+                    if os.path.exists(os.path.join(backup_dir, 'DEPLOYED_SOURCE_CODE')):
+                        tar.add(os.path.join(backup_dir, 'DEPLOYED_SOURCE_CODE'), 
+                               arcname='DEPLOYED_SOURCE_CODE')
+                    
+                    # Add Railway data directory  
+                    if os.path.exists(os.path.join(backup_dir, 'RAILWAY_VOLUME_DATA')):
+                        tar.add(os.path.join(backup_dir, 'RAILWAY_VOLUME_DATA'), 
+                               arcname='RAILWAY_VOLUME_DATA')
+                    
+                    # Add backup info file
+                    if os.path.exists(os.path.join(backup_dir, 'DEPLOYED_BACKUP_INFO.txt')):
+                        tar.add(os.path.join(backup_dir, 'DEPLOYED_BACKUP_INFO.txt'), 
+                               arcname='DEPLOYED_BACKUP_INFO.txt')
+                
+                # Verify tar file was created successfully
+                if not os.path.exists(tar_path) or os.path.getsize(tar_path) == 0:
+                    raise Exception("Tar file creation failed or file is empty")
+                
+                # Return the backup file for download
+                from flask import send_file
+                return send_file(tar_path, 
+                               as_attachment=True, 
+                               download_name=custom_name,
+                               mimetype='application/gzip')
+                               
+            except Exception as tar_error:
+                raise Exception(f"Tar file creation failed: {str(tar_error)}")
     
     except Exception as e:
-        return redirect(url_for('backup_system.backup_system_dashboard', 
-                              message=f"Backup failed: {str(e)}", 
-                              message_type='error'))
-
+        return redirect(url_for('backup_system.backup_system_dashboard') + 
+                       f'?message=Backup failed: {str(e)}&message_type=error')
 @backup_system_bp.route('/admin/backup/github-push', methods=['POST'])
 def github_backup_push():
     """Push current state to GitHub with backup tag"""

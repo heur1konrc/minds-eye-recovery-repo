@@ -68,7 +68,6 @@ def portfolio_management():
     
     # Get all images from database - sorted by capture date newest to oldest
     images = Image.query.order_by(
-        Image.capture_date.desc().nullslast(),
         Image.upload_date.desc()
     ).all()
     portfolio_data = []

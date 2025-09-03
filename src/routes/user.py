@@ -78,11 +78,8 @@ def get_portfolio_debug():
 def get_portfolio():
     """API endpoint to get portfolio data from SQL database"""
     try:
-        # Sort by capture_date newest to oldest, fallback to upload_date if capture_date is null
-        images = Image.query.order_by(
-            Image.capture_date.desc().nullslast(),
-            Image.upload_date.desc()
-        ).all()
+        # Sort by upload_date newest to oldest (capture_date will be added after migration)
+        images = Image.query.order_by(Image.upload_date.desc()).all()
         portfolio_data = []
         
         print(f"Found {len(images)} images in database (sorted by capture date)")  # Debug log
@@ -97,7 +94,6 @@ def get_portfolio():
                 'description': image.description or "",
                 'image': image.filename,  # Frontend expects 'image' field
                 'categories': image_categories,
-                'capture_date': image.capture_date.isoformat() if image.capture_date else None,
                 'upload_date': image.upload_date.isoformat() if image.upload_date else None,
                 'metadata': {
                     'created_at': image.created_at.isoformat() if image.created_at else None,

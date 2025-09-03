@@ -27,8 +27,8 @@ def simple_backup_download():
         # Copy ALL SOURCE CODE - COMPLETE BACKUP
         import subprocess
         
-        # Get the entire project directory
-        project_root = "/app"
+        # Get the actual project directory (GitHub repository)
+        project_root = "/home/ubuntu/minds-eye-recovery"
         if os.path.exists(project_root):
             # Copy entire project except node_modules and other large dirs
             for item in os.listdir(project_root):
