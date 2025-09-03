@@ -233,11 +233,10 @@ const ContactPage = () => {
                       className="w-full px-4 py-3 border border-slate-600 rounded-md bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     >
                       <option value="">Select budget</option>
-                      <option value="Under $1,000">Under $1,000</option>
-                      <option value="$1,000 - $2,500">$1,000 - $2,500</option>
-                      <option value="$2,500 - $5,000">$2,500 - $5,000</option>
-                      <option value="$5,000 - $10,000">$5,000 - $10,000</option>
-                      <option value="Over $10,000">Over $10,000</option>
+                      <option value="Under $500">Under $500</option>
+                      <option value="$500 - $1000">$500 - $1000</option>
+                      <option value="$1000 - $1500">$1000 - $1500</option>
+                      <option value="Need a Quote">Need a Quote</option>
                     </select>
                   </div>
                 </div>

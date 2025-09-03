@@ -14,8 +14,8 @@ contact_bp = Blueprint('contact_form', __name__)
 # Google SMTP Configuration
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
-SMTP_USERNAME = 'info@themindseyestudio.com'
-SMTP_PASSWORD = os.environ.get('GOOGLE_APP_PASSWORD', '')  # Set this in Railway environment
+SMTP_USERNAME = 'rick@themindseyestudio.com'  # Login username
+SMTP_PASSWORD = 'dvke joyj ydge qcma'  # Updated Google app password
 
 @contact_bp.route('/api/contact', methods=['POST'])
 def send_contact_form():

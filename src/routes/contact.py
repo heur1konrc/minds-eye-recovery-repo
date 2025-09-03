@@ -55,13 +55,13 @@ Reply directly to this email to respond to the client.
         
         # Send email using Google Workspace SMTP
         try:
-            # Google Workspace SMTP configuration
+            # Google SMTP configuration
             smtp_server = "smtp.gmail.com"
             smtp_port = 587
-            smtp_login = "rick@themindseyestudio.com"  # Actual Google account for SMTP login
-            sender_password = "yrdx gmvq poem wnnw"  # App-specific password
-            sender_email = "info@themindseyestudio.com"  # Display address (alias)
-            recipient_email = "info@themindseyestudio.com"  # Email alias for receiving
+            smtp_login = "rick@themindseyestudio.com"  # Google account for SMTP login
+            sender_password = "dvke joyj ydge qcma"  # New app-specific password
+            sender_email = "info@themindseyestudio.com"  # Display address
+            recipient_email = "info@themindseyestudio.com"  # Email for receiving
             
             # Create message
             msg = MIMEMultipart()
