@@ -1,0 +1,20 @@
+[phases.setup]
+nixPkgs = ["python3", "nodejs_20", "gcc"]
+
+[phases.install]
+cmds = [
+    "python -m venv --copies /opt/venv",
+    ". /opt/venv/bin/activate && pip install -r requirements.txt",
+    "cd frontend && npm install",
+    "cd frontend && npm run build"
+]
+
+[phases.build]
+cmds = [
+    "mkdir -p src/static",
+    "cp -r frontend/dist/* src/static/"
+]
+
+[start]
+cmd = "gunicorn --bind 0.0.0.0:$PORT wsgi:app"
+
