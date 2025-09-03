@@ -157,7 +157,7 @@ def admin_dashboard():
     # Load data from SQL database instead of JSON files
     from ..models import Image, Category
     
-    # Get all images from database - sorted by upload_date newest to oldest (capture_date after migration)
+    # Get all images from database - sorted by upload_date newest to oldest
     images = Image.query.order_by(Image.upload_date.desc()).all()
     portfolio_data = []
     

@@ -112,9 +112,7 @@ def extract_exif_data(image_path):
                             value = str(value)
                     
                     # Format common EXIF tags
-                    if tag == 'DateTime':
-                        exif_data['capture_date'] = str(value)
-                    elif tag == 'Make':
+                    if tag == 'Make':
                         exif_data['camera_make'] = str(value)
                     elif tag == 'Model':
                         exif_data['camera_model'] = str(value)

@@ -78,11 +78,11 @@ def get_portfolio_debug():
 def get_portfolio():
     """API endpoint to get portfolio data from SQL database"""
     try:
-        # Sort by upload_date newest to oldest (capture_date will be added after migration)
+        # Sort by upload_date newest to oldest
         images = Image.query.order_by(Image.upload_date.desc()).all()
         portfolio_data = []
         
-        print(f"Found {len(images)} images in database (sorted by capture date)")  # Debug log
+        print(f"Found {len(images)} images in database (sorted by upload date)")  # Debug log
         
         for image in images:
             # Get categories for this image - same as admin
@@ -102,7 +102,7 @@ def get_portfolio():
             }
             portfolio_data.append(portfolio_item)
         
-        print(f"Returning {len(portfolio_data)} portfolio items (sorted by capture date)")  # Debug log
+        print(f"Returning {len(portfolio_data)} portfolio items (sorted by upload date)")  # Debug log
         return jsonify(portfolio_data)
         
     except Exception as e:
