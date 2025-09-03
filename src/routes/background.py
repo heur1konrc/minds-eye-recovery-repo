@@ -54,8 +54,11 @@ def load_portfolio_data():
     try:
         from ..models import Image, Category
         
-        # Get all images from database - EXACT SAME QUERY
-        images = Image.query.all()
+        # Get all images from database - sorted by capture date newest to oldest
+        images = Image.query.order_by(
+            Image.capture_date.desc().nullslast(),
+            Image.upload_date.desc()
+        ).all()
         portfolio_data = []
         
         for image in images:

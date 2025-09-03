@@ -30,8 +30,11 @@ def slideshow_background_manager():
     if not settings:
         settings = SlideshowSettings()
     
-    # Get all portfolio images
-    portfolio_images = Image.query.all()
+    # Get all portfolio images - sorted by capture date newest to oldest
+    portfolio_images = Image.query.order_by(
+        Image.capture_date.desc().nullslast(),
+        Image.upload_date.desc()
+    ).all()
     
     # Get IDs of images already in slideshow
     slideshow_image_ids = [bg.image_id for bg in slideshow_backgrounds]

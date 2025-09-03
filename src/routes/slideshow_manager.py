@@ -29,8 +29,11 @@ def slideshow_manager():
         db.session.add(settings)
         db.session.commit()
     
-    # Get all portfolio images for selection
-    portfolio_images = Image.query.all()
+    # Get all portfolio images for selection - sorted by capture date newest to oldest
+    portfolio_images = Image.query.order_by(
+        Image.capture_date.desc().nullslast(),
+        Image.upload_date.desc()
+    ).all()
     
     html = '''
     <!DOCTYPE html>
