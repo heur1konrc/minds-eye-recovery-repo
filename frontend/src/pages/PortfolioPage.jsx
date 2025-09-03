@@ -63,7 +63,7 @@ const PortfolioPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl font-bold mb-4 text-orange-400"
           >
-            Portfolio
+            Portfolio - TEST DEPLOYMENT
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 30 }}
